@@ -162,7 +162,7 @@ class DaySlot extends React.Component {
     return styledEvents.map(({ event, style }, idx) => {
       let start = get(event, startAccessor)
       let end = get(event, endAccessor)
-      const key = entityKeyAccessor ? event[entityKeyAccessor] : `evt_${idx}`;
+      const key = entityKeyAccessor && event[entityKeyAccessor] ? event[entityKeyAccessor] : `evt_${idx}`;
 
       let continuesPrior = startsBefore(start, min)
       let continuesAfter = startsAfter(end, max)
