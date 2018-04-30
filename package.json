@@ -37,8 +37,8 @@
     "release": "release"
   },
   "peerDependencies": {
-    "react": "^0.14.0 || ^15.0.0",
-    "react-dom": "^0.14.0 || ^15.0.0"
+    "react": "^0.14.0 || >=15.0.0",
+    "react-dom": "^0.14.0 || >=15.0.0"
   },
   "devDependencies": {
     "@kadira/storybook": "^1.28.1",

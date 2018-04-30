@@ -73,29 +73,25 @@ let propTypes = {
   ]),
 };
 
-let MonthView = React.createClass({
+class MonthView extends React.Component {
+  static displayName = 'MonthView';
+  static propTypes = propTypes;
 
-  displayName: 'MonthView',
-
-  propTypes,
-
-  getInitialState(){
-    return {
-      rowLimit: 5,
-      needLimitMeasure: true
-    }
-  },
+  state = {
+    rowLimit: 5,
+    needLimitMeasure: true
+  };
 
   componentWillMount() {
     this._bgRows = []
     this._pendingSelection = []
-  },
+  }
 
   componentWillReceiveProps({ date }) {
     this.setState({
       needLimitMeasure: !dates.eq(date, this.props.date)
     })
-  },
+  }
 
   componentDidMount() {
     let running;
@@ -111,20 +107,20 @@ let MonthView = React.createClass({
         })
       }
     }, false)
-  },
+  }
 
   componentDidUpdate() {
     if (this.state.needLimitMeasure)
       this.measureRowLimit(this.props)
-  },
+  }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this._resizeListener, false)
-  },
+  }
 
-  getContainer() {
+  getContainer = () => {
     return findDOMNode(this)
-  },
+  };
 
   render() {
     let { date, culture, weekdayFormat, className } = this.props
@@ -146,9 +142,9 @@ let MonthView = React.createClass({
         }
       </div>
     )
-  },
+  }
 
-  renderWeek(week, weekIdx) {
+  renderWeek = (week, weekIdx) => {
     let {
       events,
       components,
@@ -199,9 +195,9 @@ let MonthView = React.createClass({
         dateCellWrapper={components.dateCellWrapper}
       />
     )
-  },
+  };
 
-  readerDateHeading({ date, className, ...props }) {
+  readerDateHeading = ({ date, className, ...props }) => {
     let { date: currentDate, getDrilldownView, dateFormat, culture  } = this.props;
 
     let isOffRange = dates.month(date) !== dates.month(currentDate);
@@ -232,9 +228,9 @@ let MonthView = React.createClass({
         )}
       </div>
     )
-  },
+  };
 
-  _headers(row, format, culture) {
+  _headers = (row, format, culture) => {
     let first = row[0]
     let last = row[row.length - 1]
     let HeaderComponent = this.props.components.header || Header
@@ -254,9 +250,9 @@ let MonthView = React.createClass({
         />
       </div>
     )
-  },
+  };
 
-  _renderOverlay() {
+  _renderOverlay = () => {
     let overlay = (this.state && this.state.overlay) || {};
     let { components } = this.props;
 
@@ -280,35 +276,35 @@ let MonthView = React.createClass({
         />
       </Overlay>
     )
-  },
+  };
 
-  measureRowLimit() {
+  measureRowLimit = () => {
     this.setState({
       needLimitMeasure: false,
       rowLimit: this.refs.slotRow.getRowLimit(),
     })
-  },
+  };
 
-  handleSelectSlot(range) {
+  handleSelectSlot = (range) => {
     this._pendingSelection = this._pendingSelection
       .concat(range)
 
     clearTimeout(this._selectTimer)
     this._selectTimer = setTimeout(()=> this._selectDates())
-  },
+  };
 
-  handleHeadingClick(date, view, e){
+  handleHeadingClick = (date, view, e) => {
     e.preventDefault();
     this.clearSelection()
     notify(this.props.onDrillDown, [date, view])
-  },
+  };
 
-  handleSelectEvent(...args){
+  handleSelectEvent = (...args) => {
     this.clearSelection()
     notify(this.props.onSelectEvent, args)
-  },
+  };
 
-  _selectDates() {
+  _selectDates = () => {
     let slots = this._pendingSelection.slice()
 
     this._pendingSelection = []
@@ -320,9 +316,9 @@ let MonthView = React.createClass({
       start: slots[0],
       end: slots[slots.length - 1]
     })
-  },
+  };
 
-  handleShowMore(events, date, cell, slot) {
+  handleShowMore = (events, date, cell, slot) => {
     const { popup, onDrillDown, onShowMore, getDrilldownView } = this.props
     //cancel any pending selections so only the event click goes through.
     this.clearSelection()
@@ -339,14 +335,13 @@ let MonthView = React.createClass({
     }
 
     notify(onShowMore, [events, date, slot])
-  },
+  };
 
-  clearSelection(){
+  clearSelection = () => {
     clearTimeout(this._selectTimer)
     this._pendingSelection = [];
-  }
-
-});
+  };
+}
 
 MonthView.navigate = (date, action)=> {
   switch (action){

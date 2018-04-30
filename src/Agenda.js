@@ -12,9 +12,8 @@ import { accessor, dateFormat, dateRangeFormat } from './utils/propTypes';
 import { inRange } from './utils/eventLevels';
 
 
-let Agenda = React.createClass({
-
-  propTypes: {
+class Agenda extends React.Component {
+  static propTypes = {
     events: React.PropTypes.array,
     date: React.PropTypes.instanceOf(Date),
     length: React.PropTypes.number.isRequired,
@@ -33,21 +32,19 @@ let Agenda = React.createClass({
       date: PropTypes.string,
       time: PropTypes.string,
     })
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      length: 30
-    };
-  },
+  static defaultProps = {
+    length: 30
+  };
 
   componentDidMount() {
     this._adjustHeader()
-  },
+  }
 
   componentDidUpdate() {
     this._adjustHeader()
-  },
+  }
 
   render() {
     let { length, date, events, startAccessor } = this.props;
@@ -88,9 +85,9 @@ let Agenda = React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
-  renderDay(day, events, dayKey){
+  renderDay = (day, events, dayKey) => {
     let {
         culture, components
       , titleAccessor, agendaDateFormat } = this.props;
@@ -129,9 +126,9 @@ let Agenda = React.createClass({
         </tr>
       )
     }, [])
-  },
+  };
 
-  timeRangeLabel(day, event){
+  timeRangeLabel = (day, event) => {
     let {
         endAccessor, startAccessor, allDayAccessor
       , culture, messages, components } = this.props;
@@ -166,9 +163,9 @@ let Agenda = React.createClass({
         }
       </span>
     )
-  },
+  };
 
-  _adjustHeader() {
+  _adjustHeader = () => {
     let header = this.refs.header;
     let firstRow = this.refs.tbody.firstChild
 
@@ -195,8 +192,8 @@ let Agenda = React.createClass({
     else {
       classes.removeClass(header, 'rbc-header-overflowing')
     }
-  }
-});
+  };
+}
 
 Agenda.navigate = (date, action)=>{
   switch (action){

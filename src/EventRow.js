@@ -1,8 +1,9 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import EventRowMixin from './EventRowMixin';
 
 
-let EventRow = React.createClass({
+let EventRow = createReactClass({
 
   displayName: 'EventRow',
 

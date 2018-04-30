@@ -4940,13 +4940,12 @@
 	    if ((inherited || hasOwnProperty.call(value, key)) &&
 	        !(skipIndexes && (
 	           // Safari 9 has enumerable `arguments.length` in strict mode.
-	           key == 'length' ||
+	           (key == 'length' ||
 	           // Node.js 0.10 has enumerable non-index properties on buffers.
 	           (isBuff && (key == 'offset' || key == 'parent')) ||
 	           // PhantomJS 2 has enumerable non-index properties on typed arrays.
-	           (isType && (key == 'buffer' || key == 'byteLength' || key == 'byteOffset')) ||
-	           // Skip index properties.
-	           isIndex(key, length)
+	           (isType && (key == 'buffer' || key == 'byteLength' || key == 'byteOffset')) || // Skip index properties.
+               isIndex(key, length))
 	        ))) {
 	      result.push(key);
 	    }
@@ -15165,10 +15164,10 @@
 	 */
 	function hasArrayNature(obj) {
 	  return (
-	    // not null/false
-	    !!obj && (
+        // not null/false
+        !!obj && (
 	    // arrays are objects, NodeLists are functions in Safari
-	    typeof obj == 'object' || typeof obj == 'function') &&
+	    (typeof obj == 'object' || typeof obj == 'function')) &&
 	    // quacks like an array
 	    'length' in obj &&
 	    // not window
@@ -15177,12 +15176,11 @@
 	    // a 'select' element has 'length' and 'item' properties on IE8
 	    typeof obj.nodeType != 'number' && (
 	    // a real array
-	    Array.isArray(obj) ||
+	    (Array.isArray(obj) ||
 	    // arguments
-	    'callee' in obj ||
-	    // HTMLCollection/NodeList
-	    'item' in obj)
-	  );
+	    'callee' in obj || // HTMLCollection/NodeList
+        'item' in obj))
+      );
 	}
 	
 	/**
@@ -20406,7 +20404,7 @@
 	    }
 	    !(
 	    // TODO: An `isValidNode` function would probably be more appropriate
-	    renderedElement === null || renderedElement === false || React.isValidElement(renderedElement)) ? process.env.NODE_ENV !== 'production' ? invariant(false, '%s.render(): A valid React element (or null) must be returned. You may have returned undefined, an array or some other invalid object.', this.getName() || 'ReactCompositeComponent') : _prodInvariant('109', this.getName() || 'ReactCompositeComponent') : void 0;
+	    (renderedElement === null || renderedElement === false || React.isValidElement(renderedElement))) ? process.env.NODE_ENV !== 'production' ? invariant(false, '%s.render(): A valid React element (or null) must be returned. You may have returned undefined, an array or some other invalid object.', this.getName() || 'ReactCompositeComponent') : _prodInvariant('109', this.getName() || 'ReactCompositeComponent') : void 0;
 	
 	    return renderedElement;
 	  },
@@ -34627,13 +34625,12 @@
 	
 	  return !(
 	  // 'a' bottom doesn't touch 'b' top
-	  aBottom - tolerance < bTop ||
+	  (aBottom - tolerance < bTop ||
 	  // 'a' top doesn't touch 'b' bottom
 	  aTop + tolerance > bBottom ||
 	  // 'a' right doesn't touch 'b' left
-	  aRight - tolerance < bLeft ||
-	  // 'a' left doesn't touch 'b' right
-	  aLeft + tolerance > bRight);
+	  aRight - tolerance < bLeft || // 'a' left doesn't touch 'b' right
+      aLeft + tolerance > bRight));
 	}
 	
 	/**

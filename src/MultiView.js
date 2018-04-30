@@ -3,11 +3,10 @@ import dates from './utils/dates';
 import MultiTimeGrid from './MultiTimeGrid';
 import { navigate } from './utils/constants';
 
-let MultiView = React.createClass({
-
-  propTypes: {
+class MultiView extends React.Component {
+  static propTypes = {
     date: React.PropTypes.instanceOf(Date).isRequired,
-  },
+  };
 
   render() {
     let { date, ...props } = this.props;
@@ -17,7 +16,7 @@ let MultiView = React.createClass({
       <MultiTimeGrid {...props} start={start} end={end} eventOffset={10} />
     );
   }
-});
+}
 
 MultiView.navigate = (date, action)=>{
   switch (action){
