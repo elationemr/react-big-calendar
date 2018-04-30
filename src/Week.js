@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import dates from './utils/dates';
 import localizer from './localizer';
@@ -7,7 +8,7 @@ import TimeGrid from './TimeGrid';
 
 class Week extends React.Component {
   static propTypes = {
-    date: React.PropTypes.instanceOf(Date).isRequired,
+    date: PropTypes.instanceOf(Date).isRequired,
   };
 
   static defaultProps = TimeGrid.defaultProps;

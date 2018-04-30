@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { findDOMNode } from 'react-dom';
 import cn from 'classnames';
@@ -28,16 +29,16 @@ function startsAfter(date, max) {
 
 class DaySlot extends React.Component {
   static propTypes = {
-    events: React.PropTypes.array.isRequired,
-    entityKeyAccessor: React.PropTypes.string,
-    step: React.PropTypes.number.isRequired,
-    rightOffset: React.PropTypes.number.isRequired,
-    min: React.PropTypes.instanceOf(Date).isRequired,
-    max: React.PropTypes.instanceOf(Date).isRequired,
-    now: React.PropTypes.instanceOf(Date),
-    nowTimezone: React.PropTypes.string,
+    events: PropTypes.array.isRequired,
+    entityKeyAccessor: PropTypes.string,
+    step: PropTypes.number.isRequired,
+    rightOffset: PropTypes.number.isRequired,
+    min: PropTypes.instanceOf(Date).isRequired,
+    max: PropTypes.instanceOf(Date).isRequired,
+    now: PropTypes.instanceOf(Date),
+    nowTimezone: PropTypes.string,
 
-    rtl: React.PropTypes.bool,
+    rtl: PropTypes.bool,
     titleAccessor: accessor,
     allDayAccessor: accessor.isRequired,
     startAccessor: accessor.isRequired,
@@ -45,26 +46,26 @@ class DaySlot extends React.Component {
 
     selectRangeFormat: dateFormat,
     eventTimeRangeFormat: dateFormat,
-    culture: React.PropTypes.string,
+    culture: PropTypes.string,
 
-    selected: React.PropTypes.object,
-    selectable: React.PropTypes.oneOf([true, false, 'ignoreEvents']),
-    eventOffset: React.PropTypes.number,
-    entityKey: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
+    selected: PropTypes.object,
+    selectable: PropTypes.oneOf([true, false, 'ignoreEvents']),
+    eventOffset: PropTypes.number,
+    entityKey: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 
-    onSelecting: React.PropTypes.func,
-    onSelectSlot: React.PropTypes.func.isRequired,
-    onSelectEvent: React.PropTypes.func.isRequired,
+    onSelecting: PropTypes.func,
+    onSelectSlot: PropTypes.func.isRequired,
+    onSelectEvent: PropTypes.func.isRequired,
 
-    className: React.PropTypes.string,
-    dragThroughEvents: React.PropTypes.bool,
-    eventPropGetter: React.PropTypes.func,
+    className: PropTypes.string,
+    dragThroughEvents: PropTypes.bool,
+    eventPropGetter: PropTypes.func,
     dayWrapperComponent: elementType,
     eventComponent: elementType,
     eventWrapperComponent: elementType.isRequired,
 
     // internal prop used to make slight changes in rendering
-    isMultiGrid: React.PropTypes.bool,
+    isMultiGrid: PropTypes.bool,
   };
 
   static defaultProps = { dragThroughEvents: true, rightOffset: 0, isMultiGrid: false };

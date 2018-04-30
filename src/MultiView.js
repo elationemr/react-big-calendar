@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import dates from './utils/dates';
 import MultiTimeGrid from './MultiTimeGrid';
@@ -5,7 +6,7 @@ import { navigate } from './utils/constants';
 
 class MultiView extends React.Component {
   static propTypes = {
-    date: React.PropTypes.instanceOf(Date).isRequired,
+    date: PropTypes.instanceOf(Date).isRequired,
   };
 
   render() {
