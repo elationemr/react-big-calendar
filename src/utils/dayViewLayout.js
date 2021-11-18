@@ -237,13 +237,14 @@ export default function getStyledEvents ({
     let { childGroups, nbrOfChildColumns } = getChildGroups(
       idx, idx + siblings.length + 1, helperArgs
     )
-    let nbrOfColumns = Math.max(nbrOfChildColumns, siblings.length) + 1;
+    // +1 for self
+    let nbrOfColumns = nbrOfChildColumns + siblings.length + 1;
 
     // Set styles to top level events.
+    let width = (100 - rightOffset) / nbrOfColumns;
+    let xAdjustment = width * (nbrOfColumns > 1 ? OVERLAP_MULTIPLIER : 0);
     [idx, ...siblings].forEach((eventIdx, siblingIdx) => {
-      let width = (100 - rightOffset) / nbrOfColumns
-      let xAdjustment = width * (nbrOfColumns > 1 ? OVERLAP_MULTIPLIER : 0)
-      let { top, height } = getYStyles(eventIdx, helperArgs)
+      let { top, height } = getYStyles(eventIdx, helperArgs);
 
       styledEvents[eventIdx] = {
         event: events[eventIdx],
@@ -251,7 +252,7 @@ export default function getStyledEvents ({
           top,
           height,
           width: width + xAdjustment,
-          xOffset: (width * siblingIdx) - xAdjustment
+          xOffset: width * siblingIdx
         }
       }
     })
@@ -270,10 +271,10 @@ export default function getStyledEvents ({
       // Set styles to child events.
       group.forEach((eventIdx, i) => {
         let { style: parentStyle } = styledEvents[parentIdx]
-        let spaceOccupiedByParent = parentStyle.width + parentStyle.xOffset
-        let columns = Math.min(group.length, nbrOfColumns)
-        let width = (100 - rightOffset - spaceOccupiedByParent) / columns
-        let xAdjustment = spaceOccupiedByParent * OVERLAP_MULTIPLIER
+        let spaceOccupiedByParent = parentStyle.width + parentStyle.xOffset - xAdjustment;
+        let childColumns = Math.min(group.length, nbrOfColumns)
+        let childWidth = (100 - rightOffset - spaceOccupiedByParent) / childColumns;
+        let childXAdjustment = i + 1 === group.length ? 0 : (childWidth * OVERLAP_MULTIPLIER);
         let { top, height } = getYStyles(eventIdx, helperArgs)
 
         styledEvents[eventIdx] = {
@@ -281,8 +282,8 @@ export default function getStyledEvents ({
           style: {
             top,
             height,
-            width: width + xAdjustment,
-            xOffset: spaceOccupiedByParent + (width * i) - xAdjustment
+            width: childWidth + childXAdjustment,
+            xOffset: spaceOccupiedByParent + (childWidth * i),
           }
         }
       })
