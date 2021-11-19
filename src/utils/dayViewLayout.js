@@ -229,6 +229,7 @@ export default function getStyledEvents ({
   let events = sort(unsortedEvents, { startAccessor, endAccessor, entityKeyAccessor })
   let helperArgs = { events, startAccessor, endAccessor, min, totalMin, step }
   let styledEvents = []
+  // idx of top-most, left-most event in each group of events
   let idx = 0
 
   // One iteration will cover all connected events.
@@ -238,35 +239,43 @@ export default function getStyledEvents ({
       idx, idx + siblings.length + 1, helperArgs
     );
 
-    // Calculate max sibling + children columns
-    // Only count children if they overlap with a parent
-    // Also think about children's children
+    // Calculate number of columns based on top level events plus
+    // any overlapping child events to ensure all events share
+    // space equally
     let nbrOfColumns = siblings.length + 1;
     [idx, ...siblings].forEach((eventIdx, siblingIdx) => {
       childGroups.forEach(group => {
         if (isChild(eventIdx, group[0], helperArgs)) {
+          // nbrOfColumns is the max of number of top level events plus
+          // number of nested child events. Some top level events have more overlapping
+          // child events than others.
           nbrOfColumns = Math.max(nbrOfColumns, group.length + siblingIdx + 1)
-          // console.log({nbrOfColumns, siblingIdx, 'group.length': group.length});
         }
       });
     });
-    // 1 for self
 
+    // Width of the top level events
+    let width = (100 - rightOffset) / nbrOfColumns;
+
+    // Calculate how much of the width need to be extended so that
+    // the events can appear to be underneath each other, as opposed
+    // to blocks that are stacked next to each other
+    let xAdjustment = width * (nbrOfColumns > 1 ? OVERLAP_MULTIPLIER : 0);
 
     // Set styles to top level events.
-    let width = (100 - rightOffset) / nbrOfColumns;
-    let xAdjustment = width * (nbrOfColumns > 1 ? OVERLAP_MULTIPLIER : 0);
-    let siblingsPlusSelf = [idx, ...siblings];
-    siblingsPlusSelf.forEach((eventIdx, siblingIdx) => {
+    [idx, ...siblings].forEach((eventIdx, siblingIdx) => {
       let { top, height } = getYStyles(eventIdx, helperArgs);
-      let isLastSibling = siblingsPlusSelf.length === siblingIdx + 1;
+
+      // Determines if this event is the last in the number of top
+      // level events + their overlapping child events
+      let isLastEvent = nbrOfColumns === siblingIdx + 1;
 
       styledEvents[eventIdx] = {
         event: events[eventIdx],
         style: {
           top,
           height,
-          width: width + (isLastSibling ? 0: xAdjustment),
+          width: width + (isLastEvent ? 0: xAdjustment),
           xOffset: width * siblingIdx
         }
       }
@@ -286,9 +295,16 @@ export default function getStyledEvents ({
       // Set styles to child events.
       group.forEach((eventIdx, i) => {
         let { style: parentStyle } = styledEvents[parentIdx]
+
+        // Calculate space occupied by parent to know how much space the child groups
+        // can occupy
         let spaceOccupiedByParent = parentStyle.width + parentStyle.xOffset - xAdjustment;
+
+        // Calculate width of each child event
         let childColumns = Math.min(group.length, nbrOfColumns)
         let childWidth = (100 - rightOffset - spaceOccupiedByParent) / childColumns;
+
+        // Adjust event width so they appear underneath others
         let childXAdjustment = i + 1 === group.length ? 0 : (childWidth * OVERLAP_MULTIPLIER);
         let { top, height } = getYStyles(eventIdx, helperArgs)
 

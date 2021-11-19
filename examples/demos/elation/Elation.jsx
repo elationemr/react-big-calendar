@@ -69,7 +69,7 @@ export default class Elation extends React.Component {
         formats={formats}
         nowTimezone="America/Los_Angeles"
         step={10}
-        rightOffset={10}
+        rightOffset={5}
         groupHeight={140}
         timeslots={6}
         views={['day', 'week', 'multi']}
