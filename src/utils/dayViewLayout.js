@@ -233,25 +233,40 @@ export default function getStyledEvents ({
 
   // One iteration will cover all connected events.
   while (idx < events.length) {
-    let siblings = getSiblings(idx, helperArgs)
-    let { childGroups, nbrOfChildColumns } = getChildGroups(
+    let siblings = getSiblings(idx, helperArgs);
+    let { childGroups } = getChildGroups(
       idx, idx + siblings.length + 1, helperArgs
-    )
-    // +1 for self
-    let nbrOfColumns = nbrOfChildColumns + siblings.length + 1;
+    );
+
+    // Calculate max sibling + children columns
+    // Only count children if they overlap with a parent
+    // Also think about children's children
+    let nbrOfColumns = siblings.length + 1;
+    [idx, ...siblings].forEach((eventIdx, siblingIdx) => {
+      childGroups.forEach(group => {
+        if (isChild(eventIdx, group[0], helperArgs)) {
+          nbrOfColumns = Math.max(nbrOfColumns, group.length + siblingIdx + 1)
+          // console.log({nbrOfColumns, siblingIdx, 'group.length': group.length});
+        }
+      });
+    });
+    // 1 for self
+
 
     // Set styles to top level events.
     let width = (100 - rightOffset) / nbrOfColumns;
     let xAdjustment = width * (nbrOfColumns > 1 ? OVERLAP_MULTIPLIER : 0);
-    [idx, ...siblings].forEach((eventIdx, siblingIdx) => {
+    let siblingsPlusSelf = [idx, ...siblings];
+    siblingsPlusSelf.forEach((eventIdx, siblingIdx) => {
       let { top, height } = getYStyles(eventIdx, helperArgs);
+      let isLastSibling = siblingsPlusSelf.length === siblingIdx + 1;
 
       styledEvents[eventIdx] = {
         event: events[eventIdx],
         style: {
           top,
           height,
-          width: width + xAdjustment,
+          width: width + (isLastSibling ? 0: xAdjustment),
           xOffset: width * siblingIdx
         }
       }
