@@ -131,7 +131,7 @@ export default class TimeColumn extends Component {
     if (!dragThroughEvents) return;
 
     let now = dates.now(nowTimezone);
-    const currentHour = now.getHours(nowTimezone);
+    const currentHour = now.getHours();
 
     const daylightSavingsShift = getDaylightSavingsShift(now);
     const isFallingBack = isDaylightSavingsFall(daylightSavingsShift);
