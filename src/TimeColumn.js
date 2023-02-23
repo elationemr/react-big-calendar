@@ -132,21 +132,19 @@ export default class TimeColumn extends Component {
 
     let now = dates.now(nowTimezone);
 
-    const dayStart = dates.startOf(now, 'day');
     const dayEnd = dates.endOf(now, 'day');
 
-    const dayStartTimezoneOffset = dayStart.getTimezoneOffset();
     const dayEndTimezoneOffset = dayEnd.getTimezoneOffset();
     const nowTimezoneOffset = now.getTimezoneOffset();
-
-    // This is generally at 2:00am on the day we fall back to standard time
-    const isAfterFallBackTimeShift =
-      dayStartTimezoneOffset < dayEndTimezoneOffset && nowTimezoneOffset === dayEndTimezoneOffset;
 
     const daylightSavingsShift = getDaylightSavingsShift(now);
     const isFallingBack = isDaylightSavingsFall(daylightSavingsShift);
 
-    if (isFallingBack && isAfterFallBackTimeShift) {
+    // This is generally at 2:00am on the day we fall back to standard time
+    const isAfterFallBackTimeShift =
+      isFallingBack && nowTimezoneOffset === dayEndTimezoneOffset;
+
+    if (isAfterFallBackTimeShift) {
       now = dates.add(now, daylightSavingsShift, 'minutes');
     }
 
