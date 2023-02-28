@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import cn from 'classnames';
 
 import dates from './utils/dates';
+import { isDaylightSavingsFall, getDaylightSavingsShift } from './utils/daylightSavings';
 import { elementType } from './utils/propTypes';
 import BackgroundWrapper from './BackgroundWrapper';
 import TimeSlotGroup from './TimeSlotGroup'
@@ -129,7 +130,23 @@ export default class TimeColumn extends Component {
     // excluding the time gutter TimeColumn from having a time indicator.
     if (!dragThroughEvents) return;
 
-    const now = dates.now(nowTimezone);
+    let now = dates.now(nowTimezone);
+
+    const dayEnd = dates.endOf(now, 'day');
+
+    const dayEndTimezoneOffset = dayEnd.getTimezoneOffset();
+    const nowTimezoneOffset = now.getTimezoneOffset();
+
+    const daylightSavingsShift = getDaylightSavingsShift(now);
+    const isFallingBack = isDaylightSavingsFall(daylightSavingsShift);
+
+    // This is generally at 2:00am on the day we fall back to standard time
+    const isAfterFallBackTimeShift =
+      isFallingBack && nowTimezoneOffset === dayEndTimezoneOffset;
+
+    if (isAfterFallBackTimeShift) {
+      now = dates.add(now, daylightSavingsShift, 'minutes');
+    }
 
     const secondsGrid = dates.diff(max, min, 'seconds');
     const secondsPassed = dates.diff(now, min, 'seconds');
