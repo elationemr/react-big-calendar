@@ -16,7 +16,7 @@ import message from './utils/messages';
 
 import { accessor, dateFormat } from './utils/propTypes';
 
-import { notify, isAllDayEvent, makeEventFilter } from './utils/helpers';
+import { notify, isAllDayEvent, makeAvailabilityFilter, makeEventFilter } from './utils/helpers';
 
 import { inRange, sortEvents, segStyle } from './utils/eventLevels';
 
@@ -24,6 +24,7 @@ export default class TimeGrid extends Component {
 
   static propTypes = {
     view: PropTypes.string.isRequired,
+    availabilities: PropTypes.array,
     events: PropTypes.array.isRequired,
     singleDayEventsOnly: PropTypes.bool,
 
@@ -189,16 +190,19 @@ export default class TimeGrid extends Component {
   }
 
   renderEvents(range, events, today){
-    let { min, max, endAccessor, startAccessor, components } = this.props;
+    let { availabilities, min, max, endAccessor, startAccessor, components } = this.props;
 
     return range.map((date, idx) => {
       let daysEvents = events.filter(makeEventFilter(date, { startAccessor, endAccessor }));
+      const daysAvailabilities = (availabilities || []).filter(makeAvailabilityFilter(date));
 
       return (
         <DayColumn
           {...this.props }
           min={dates.merge(date, min)}
           max={dates.merge(date, max)}
+          availabilityComponent={components.availability}
+          availabilityWrapperComponent={components.availabilityWrapper}
           eventComponent={components.event}
           eventWrapperComponent={components.eventWrapper}
           dayWrapperComponent={components.dayWrapper}
@@ -207,6 +211,7 @@ export default class TimeGrid extends Component {
           key={idx}
           date={date}
           events={daysEvents}
+          availabilities={daysAvailabilities}
         />
       )
     })

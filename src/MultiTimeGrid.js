@@ -13,7 +13,7 @@ import scrollbarSize from 'dom-helpers/util/scrollbarSize';
 
 import { accessor, dateFormat } from './utils/propTypes';
 
-import { notify, isAllDayEvent, makeEventFilter } from './utils/helpers';
+import { notify, isAllDayEvent, makeEventFilter, makeAvailabilityFilter } from './utils/helpers';
 
 import { accessor as get } from './utils/accessors';
 
@@ -23,6 +23,7 @@ export default class MultiTimeGrid extends Component {
 
   static propTypes = {
     view: PropTypes.string.isRequired,
+    availabilityMap: PropTypes.object,
     eventMap: PropTypes.object.isRequired,
     entities: PropTypes.array.isRequired,
     entityKeyAccessor: PropTypes.string.isRequired,
@@ -224,17 +225,22 @@ export default class MultiTimeGrid extends Component {
   }
 
   renderEvents(date, rangeEventsMap /* , today */){
-    let { min, max, endAccessor, startAccessor, components } = this.props;
+    let { min, max, endAccessor, startAccessor, components, availabilityMap } = this.props;
 
     return this.props.selectedEntityKeys.map((selectedEntityKey, idx) => {
       let daysEvents = rangeEventsMap[selectedEntityKey] || [];
       daysEvents = daysEvents.filter(makeEventFilter(date, { startAccessor, endAccessor }));
+      const providerAvailabilities = availabilityMap ? (availabilityMap[selectedEntityKey] || []) : [];
+      const daysAvailabilities = providerAvailabilities.filter(makeAvailabilityFilter(date));
 
       return (
         <DayColumn
           {...this.props }
           min={dates.merge(date, min)}
           max={dates.merge(date, max)}
+          availabilityComponent={components.availability}
+          availabilityWrapperComponent={components.availabilityWrapper}
+          availabilities={daysAvailabilities}
           eventComponent={components.event}
           eventWrapperComponent={components.eventWrapper}
           dayWrapperComponent={components.dayWrapper}

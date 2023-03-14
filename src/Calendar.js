@@ -16,6 +16,7 @@ import viewLabel from './utils/viewLabel';
 import moveDate from './utils/move';
 import VIEWS from './Views';
 import Toolbar from './Toolbar';
+import AvailabilityWrapper from './AvailabilityWrapper';
 import EventWrapper from './EventWrapper';
 import BackgroundWrapper from './BackgroundWrapper';
 
@@ -91,6 +92,19 @@ class Calendar extends React.Component {
     * be the same logical view.
     */
    viewAliases: PropTypes.object,
+
+   /**
+    * An array of physician availability objects to display on the calendar
+    */
+   availabilities: PropTypes.arrayOf(PropTypes.object),
+
+   /**
+    * <b>- MultiView ONLY -</b>
+    * An object containing key-value pairs where the key is an entity key,
+    * such as a person ID, and the value is an array of availabilities associated with
+    * that entity
+    */
+   availabilityMap: PropTypes.object,
 
    /**
     * An array of event objects to display on the calendar
@@ -337,6 +351,20 @@ class Calendar extends React.Component {
    allDayAccessor: accessor,
 
    /**
+    * The start date/time of the availability. Must resolve to a JavaScript `Date` object.
+    *
+    * @type {(func|string)}
+    */
+   availabilityStartAccessor: accessor,
+
+   /**
+    * The end date/time of the availability. Must resolve to a JavaScript `Date` object.
+    *
+    * @type {(func|string)}
+    */
+   availabilityEndAccessor: accessor,
+
+   /**
     * The start date/time of the event. Must resolve to a JavaScript `Date` object.
     *
     * @type {(func|string)}
@@ -484,6 +512,9 @@ class Calendar extends React.Component {
     * ```
     */
    components: PropTypes.shape({
+     availability: elementType,
+     availabilityWrapper: elementType,
+
      event: elementType,
      eventWrapper: elementType,
      dayWrapper: elementType,
@@ -574,7 +605,9 @@ class Calendar extends React.Component {
    titleAccessor: 'title',
    allDayAccessor: 'allDay',
    startAccessor: 'start',
-   endAccessor: 'end'
+   endAccessor: 'end',
+   availabilityStartAccessor: 'start',
+   availabilityEndAccessor: 'end'
  };
 
  /**
@@ -627,6 +660,7 @@ class Calendar extends React.Component {
  render() {
    let {
        view, toolbar, events, singleDayEventsOnly
+     , availabilities
      , culture
      , components = {}
      , componentProps = {}
@@ -651,6 +685,7 @@ class Calendar extends React.Component {
      components[view] || {},
      omit(components, names),
      {
+       availabilityWrapper: AvailabilityWrapper,
        eventWrapper: EventWrapper,
        dayWrapper: BackgroundWrapper,
        dateCellWrapper: BackgroundWrapper
@@ -690,6 +725,7 @@ class Calendar extends React.Component {
          componentProps={componentProps}
          culture={culture}
          formats={undefined}
+         availabilities={availabilities}
          events={events}
          singleDayEventsOnly={singleDayEventsOnly}
          date={current}
