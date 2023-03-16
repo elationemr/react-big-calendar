@@ -204,11 +204,9 @@ export default class TimeGrid extends Component {
     } = this.props;
 
     return range.map((date, idx) => {
-      const eventFilter = makeEventOrAvailabilityFilter(date);
-      const daysEvents = events.filter((event) => eventFilter(event, startAccessor, endAccessor ));
-      const availablityFilter = makeEventOrAvailabilityFilter(date);
+      const daysEvents = events.filter(makeEventOrAvailabilityFilter(date, startAccessor, endAccessor));
       const daysAvailabilities = (availabilities || []).filter(
-        (availability) => availablityFilter(availability, availabilityStartAccessor, availabilityEndAccessor)
+        makeEventOrAvailabilityFilter(date, availabilityStartAccessor, availabilityEndAccessor)
       );
 
       return (
