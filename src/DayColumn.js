@@ -31,6 +31,7 @@ function startsAfter(date, max) {
 class DaySlot extends React.Component {
   static propTypes = {
     availabilities: PropTypes.array,
+    availabilityKeyAccessor: PropTypes.string,
     events: PropTypes.array.isRequired,
     entityKeyAccessor: PropTypes.string,
     step: PropTypes.number.isRequired,
@@ -154,27 +155,27 @@ class DaySlot extends React.Component {
   }
 
   renderAvailabilities = () => {
-    let {
+    const {
       availabilities,
       availabilityComponent,
       availabilityWrapperComponent: AvailabilityWrapper,
       availabilityStartAccessor,
       availabilityEndAccessor,
-      entityKeyAccessor,
+      availabilityKeyAccessor,
       min,
     } = this.props;
-    let AvailabilityComponent = availabilityComponent;
-    let styledAvailabilities = getStyledAvailabilities({
+    const AvailabilityComponent = availabilityComponent;
+    const styledAvailabilities = getStyledAvailabilities({
       availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin: this._totalMin
     });
 
     return styledAvailabilities.map(({availability, style}, idx) => {
-      let { height, top } = style;
-      const key = entityKeyAccessor && availability[entityKeyAccessor]
-        ? availability[entityKeyAccessor]
+      const { height, top } = style;
+      const key = availabilityKeyAccessor && availability[availabilityKeyAccessor]
+        ? availability[availabilityKeyAccessor]
         : `avbl_${idx}`;
 
-      return AvailabilityComponent && (
+      return (
         <AvailabilityWrapper key={key}>
           <div
             className='rbc-availability'
@@ -184,13 +185,15 @@ class DaySlot extends React.Component {
             }}
           >
             <div className='rbc-availability-content'>
-              <AvailabilityComponent availability={availability} />
+              {AvailabilityComponent && (
+                <AvailabilityComponent availability={availability} />
+              )}
             </div>
           </div>
         </AvailabilityWrapper>
-      )
-    })
-  }
+      );
+    });
+  };
 
   renderEvents = () => {
     let {

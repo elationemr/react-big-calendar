@@ -13,7 +13,7 @@ import scrollbarSize from 'dom-helpers/util/scrollbarSize';
 
 import { accessor, dateFormat } from './utils/propTypes';
 
-import { notify, isAllDayEvent, makeEventFilter, makeAvailabilityFilter } from './utils/helpers';
+import { notify, isAllDayEvent, makeEventOrAvailabilityFilter } from './utils/helpers';
 
 import { accessor as get } from './utils/accessors';
 
@@ -219,15 +219,15 @@ export default class MultiTimeGrid extends Component {
           >
             {/* dummy div replacement for timeIndicator to keep css working */}
             <div style={{ display: 'none' }} />
-            {this.renderEvents(date, this.rangeEventsMap, this.props.now)}
+            {this.renderEventsAndAvailabilities(date, this.rangeEventsMap, this.props.now)}
           </div>
         </div>
       </div>
     );
   }
 
-  renderEvents(date, rangeEventsMap /* , today */){
-    let {
+  renderEventsAndAvailabilities(date, rangeEventsMap /* , today */){
+    const {
       min,
       max,
       endAccessor,
@@ -240,12 +240,16 @@ export default class MultiTimeGrid extends Component {
 
     return this.props.selectedEntityKeys.map((selectedEntityKey, idx) => {
       let daysEvents = rangeEventsMap[selectedEntityKey] || [];
-      daysEvents = daysEvents.filter(makeEventFilter(date, { startAccessor, endAccessor }));
+      const eventFilter = makeEventOrAvailabilityFilter(date);
+      daysEvents = daysEvents.filter((event) => eventFilter(event, startAccessor, endAccessor));
       const providerAvailabilities = (
         availabilityMap && availabilityMap[selectedEntityKey] || []
       );
+      const availabilityFilter = makeEventOrAvailabilityFilter(date);
       const daysAvailabilities = providerAvailabilities.filter(
-        makeAvailabilityFilter(date, {availabilityStartAccessor, availabilityEndAccessor})
+        (availability) => availabilityFilter(
+          availability, availabilityStartAccessor, availabilityEndAccessor
+        )
       );
 
       return (

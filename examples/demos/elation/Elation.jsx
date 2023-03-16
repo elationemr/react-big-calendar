@@ -65,6 +65,7 @@ export default class Elation extends React.Component {
         {...this.props}
         availabilities={this.state.availabilities}
         availabilityMap={getAllAvailabilities()}
+        availabilityKeyAccessor="id"
         events={this.state.appts}
         eventMap={getAllAppts()}
         entities={physicians}

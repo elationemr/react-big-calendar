@@ -16,7 +16,7 @@ import message from './utils/messages';
 
 import { accessor, dateFormat } from './utils/propTypes';
 
-import { notify, isAllDayEvent, makeAvailabilityFilter, makeEventFilter } from './utils/helpers';
+import { notify, isAllDayEvent, makeEventOrAvailabilityFilter } from './utils/helpers';
 
 import { inRange, sortEvents, segStyle } from './utils/eventLevels';
 
@@ -184,15 +184,15 @@ export default class TimeGrid extends Component {
             className='rbc-time-gutter'
           />
 
-          {this.renderEvents(range, rangeEvents, this.props.now)}
+          {this.renderEventsAndAvailabilities(range, rangeEvents, this.props.now)}
 
         </div>
       </div>
     );
   }
 
-  renderEvents(range, events, today){
-    let {
+  renderEventsAndAvailabilities(range, events, today){
+    const {
       availabilities,
       availabilityStartAccessor,
       availabilityEndAccessor,
@@ -204,9 +204,11 @@ export default class TimeGrid extends Component {
     } = this.props;
 
     return range.map((date, idx) => {
-      let daysEvents = events.filter(makeEventFilter(date, { startAccessor, endAccessor }));
+      const eventFilter = makeEventOrAvailabilityFilter(date);
+      const daysEvents = events.filter((event) => eventFilter(event, startAccessor, endAccessor ));
+      const availablityFilter = makeEventOrAvailabilityFilter(date);
       const daysAvailabilities = (availabilities || []).filter(
-        makeAvailabilityFilter(date, { availabilityStartAccessor, availabilityEndAccessor })
+        (availability) => availablityFilter(availability, availabilityStartAccessor, availabilityEndAccessor)
       );
 
       return (

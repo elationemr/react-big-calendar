@@ -107,6 +107,13 @@ class Calendar extends React.Component {
    availabilityMap: PropTypes.object,
 
    /**
+    * <b>- MultiView ONLY -</b>
+    * The name of the property to treat as the availability's unique identifier,
+    * e.g. `id`
+    */
+   availabilityKeyAccessor: PropTypes.string,
+
+   /**
     * An array of event objects to display on the calendar
     */
    events: PropTypes.arrayOf(PropTypes.object),
