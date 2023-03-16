@@ -45,6 +45,10 @@ export function isAllDayEvent(event, { startAccessor, endAccessor, allDayAccesso
       || (dates.isJustDate(eStart) && dates.isJustDate(eEnd) && !endsDayAfter);
 }
 
+/**
+ * Returns a filter function that returns true if an event or availability should be rendered
+ * in the specified date's day column.
+ */
 export function makeEventOrAvailabilityFilter(date, startAccessor, endAccessor) {
   return function filterDayEventsOrAvailabilities(eventOrAvailability) {
     const start = get(eventOrAvailability, startAccessor);
