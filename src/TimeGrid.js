@@ -46,6 +46,8 @@ export default class TimeGrid extends Component {
 
     titleAccessor: accessor.isRequired,
     allDayAccessor: accessor.isRequired,
+    availabilityStartAccessor: accessor,
+    availabilityEndAccessor: accessor,
     startAccessor: accessor.isRequired,
     endAccessor: accessor.isRequired,
 
@@ -190,11 +192,22 @@ export default class TimeGrid extends Component {
   }
 
   renderEvents(range, events, today){
-    let { availabilities, min, max, endAccessor, startAccessor, components } = this.props;
+    let {
+      availabilities,
+      availabilityStartAccessor,
+      availabilityEndAccessor,
+      min,
+      max,
+      endAccessor,
+      startAccessor,
+      components
+    } = this.props;
 
     return range.map((date, idx) => {
       let daysEvents = events.filter(makeEventFilter(date, { startAccessor, endAccessor }));
-      const daysAvailabilities = (availabilities || []).filter(makeAvailabilityFilter(date));
+      const daysAvailabilities = (availabilities || []).filter(
+        makeAvailabilityFilter(date, { availabilityStartAccessor, availabilityEndAccessor })
+      );
 
       return (
         <DayColumn

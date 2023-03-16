@@ -46,6 +46,8 @@ export default class MultiTimeGrid extends Component {
 
     titleAccessor: accessor.isRequired,
     allDayAccessor: accessor.isRequired,
+    availabilityStartAccessor: accessor,
+    availabilityEndAccessor: accessor,
     startAccessor: accessor.isRequired,
     endAccessor: accessor.isRequired,
 
@@ -225,13 +227,26 @@ export default class MultiTimeGrid extends Component {
   }
 
   renderEvents(date, rangeEventsMap /* , today */){
-    let { min, max, endAccessor, startAccessor, components, availabilityMap } = this.props;
+    let {
+      min,
+      max,
+      endAccessor,
+      startAccessor,
+      components,
+      availabilityMap,
+      availabilityStartAccessor,
+      availabilityEndAccessor,
+    } = this.props;
 
     return this.props.selectedEntityKeys.map((selectedEntityKey, idx) => {
       let daysEvents = rangeEventsMap[selectedEntityKey] || [];
       daysEvents = daysEvents.filter(makeEventFilter(date, { startAccessor, endAccessor }));
-      const providerAvailabilities = availabilityMap ? (availabilityMap[selectedEntityKey] || []) : [];
-      const daysAvailabilities = providerAvailabilities.filter(makeAvailabilityFilter(date));
+      const providerAvailabilities = (
+        availabilityMap && availabilityMap[selectedEntityKey] || []
+      );
+      const daysAvailabilities = providerAvailabilities.filter(
+        makeAvailabilityFilter(date, {availabilityStartAccessor, availabilityEndAccessor})
+      );
 
       return (
         <DayColumn

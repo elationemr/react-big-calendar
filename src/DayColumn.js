@@ -160,31 +160,31 @@ class DaySlot extends React.Component {
       availabilityWrapperComponent: AvailabilityWrapper,
       availabilityStartAccessor,
       availabilityEndAccessor,
+      entityKeyAccessor,
       min,
-      date,
     } = this.props;
     let AvailabilityComponent = availabilityComponent;
     let styledAvailabilities = getStyledAvailabilities({
-      availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin: this._totalMin, date
+      availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin: this._totalMin
     });
 
-    return styledAvailabilities.map(({availability, style}, index) => {
+    return styledAvailabilities.map(({availability, style}, idx) => {
       let { height, top } = style;
+      const key = entityKeyAccessor && availability[entityKeyAccessor]
+        ? availability[entityKeyAccessor]
+        : `avbl_${idx}`;
 
-      return AvailabilityWrapper && (
-        <AvailabilityWrapper key={index}>
+      return AvailabilityComponent && (
+        <AvailabilityWrapper key={key}>
           <div
             className='rbc-availability'
             style={{
               top: `${top}%`,
               height: `${height}%`,
             }}
-            title='Provider Availability'
           >
             <div className='rbc-availability-content'>
-              {AvailabilityComponent && (
-                <AvailabilityComponent availability={availability} />
-              )}
+              <AvailabilityComponent availability={availability} />
             </div>
           </div>
         </AvailabilityWrapper>

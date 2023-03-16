@@ -8,9 +8,9 @@ export default class Availability extends React.Component {
 
   render() {
     const { availability} = this.props;
-    const nowStartTime = new Date(Date.now());
+    const nowStartTime = new Date();
     nowStartTime.setHours(...availability.startTime.split(':'));
-    const nowEndTime = new Date(Date.now());
+    const nowEndTime = new Date();
     nowEndTime.setHours(...availability.endTime.split(':'))
 
     return (

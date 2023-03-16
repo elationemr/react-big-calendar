@@ -94,7 +94,7 @@ class Calendar extends React.Component {
    viewAliases: PropTypes.object,
 
    /**
-    * An array of physician availability objects to display on the calendar
+    * An array of availability objects to display on the calendar
     */
    availabilities: PropTypes.arrayOf(PropTypes.object),
 

@@ -335,16 +335,17 @@ export default function getStyledEvents ({
  *
  */
 export function getStyledAvailabilities ({
-  availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin, date
+  availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin
 }) {
   let styledAvailabilities = [];
 
   if (!availabilities) return styledAvailabilities;
 
   availabilities.forEach((availability) => {
-    const startTime = availabilityStartAccessor({availability, date});
+    const startTime = availabilityStartAccessor(availability);
     const start = positionFromDate(startTime, min, totalMin);
-    const endTime = availabilityEndAccessor({availability, date});
+
+    const endTime = availabilityEndAccessor(availability);
     const end = positionFromDate(endTime, min, totalMin);
 
     const top = (start / totalMin) * 100;

@@ -90,15 +90,15 @@ export default class Elation extends React.Component {
         titleAccessor="_patientName"
         startAccessor={(event) => new Date(event._apptTime)}
         endAccessor={(event) => new Date(event._apptEnd)}
-        availabilityStartAccessor={({availability, date}) => {
-          const availabilityDayStart = new Date(date);
-          availabilityDayStart.setHours(...availability.startTime.split(':'));
-          return availabilityDayStart;
+        availabilityStartAccessor={(availability) => {
+          const startDate = new Date(2015, 3, 12);
+          startDate.setHours(...availability.startTime.split(':'));
+          return startDate;
         }}
-        availabilityEndAccessor={({availability, date}) => {
-          const availabilityDayEnd = new Date(date);
-          availabilityDayEnd.setHours(...availability.endTime.split(':'));
-          return availabilityDayEnd;
+        availabilityEndAccessor={(availability) => {
+          const endDate = new Date(2015, 3, 12);
+          endDate.setHours(...availability.endTime.split(':'));
+          return endDate;
         }}
         drilldownView={null}
         components={{

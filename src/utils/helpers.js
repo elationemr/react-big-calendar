@@ -63,9 +63,12 @@ export function makeEventFilter(date, { startAccessor, endAccessor }) {
  * Returns a filter function that returns true if an availability should be rendered
  * in the specified date's day column.
  */
-export function makeAvailabilityFilter(date) {
-  return function filterDayAvailabilities(availability) {
-    const AVAILABILITY_WEEK_DAYS = [6, 0, 1, 2, 3, 4, 5];
-    return AVAILABILITY_WEEK_DAYS.indexOf(availability.weekday) === date.getDay();
+export function makeAvailabilityFilter(date, { availabilityStartAccessor, availabilityEndAccessor }) {
+  return function filterDayEvents(availability) {
+    const start = get(availability, availabilityStartAccessor);
+    return dates.inRange(date,
+      start,
+      get(availability, availabilityEndAccessor), 'day'
+    ) && dates.eq(date, start, 'day') // ignore back end of long range availabilities for now
   }
 }
