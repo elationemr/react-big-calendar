@@ -240,16 +240,12 @@ export default class MultiTimeGrid extends Component {
 
     return this.props.selectedEntityKeys.map((selectedEntityKey, idx) => {
       let daysEvents = rangeEventsMap[selectedEntityKey] || [];
-      const eventFilter = makeEventOrAvailabilityFilter(date);
-      daysEvents = daysEvents.filter((event) => eventFilter(event, startAccessor, endAccessor));
+      daysEvents = daysEvents.filter(makeEventOrAvailabilityFilter(date, startAccessor, endAccessor));
       const availabilities = (
         availabilityMap && availabilityMap[selectedEntityKey] || []
       );
-      const availabilityFilter = makeEventOrAvailabilityFilter(date);
       const daysAvailabilities = availabilities.filter(
-        (availability) => availabilityFilter(
-          availability, availabilityStartAccessor, availabilityEndAccessor
-        )
+        makeEventOrAvailabilityFilter(date, availabilityStartAccessor, availabilityEndAccessor)
       );
 
       return (
