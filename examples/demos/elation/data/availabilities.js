@@ -3,8 +3,8 @@ const availabilities = {
     {
       'id': 12,
       'owner_id': 28716,
-      'startTime': '04:00:00',
-      'endTime': '09:00:00',
+      'startTime': '2015-04-12T11:00:00.000Z',
+      'endTime': '2015-04-12T15:00:00.000Z',
       'weekday': 6,
       'serviceLocationId': 24503910647,
       'appointmentTypes': [
@@ -57,8 +57,8 @@ const availabilities = {
     {
       'id': 13,
       'owner_id': 28716,
-      'startTime': '10:00:00',
-      'endTime': '14:00:00',
+      'startTime': '2015-04-12T17:00:00.000Z',
+      'endTime': '2015-04-12T21:00:00.000Z',
       'weekday': 6,
       'serviceLocationId': 24503910647,
       'appointmentTypes': [
@@ -132,8 +132,8 @@ const availabilities = {
     {
       'id': 14,
       'owner_id': 235,
-      'startTime': '07:00:00',
-      'endTime': '12:00:00',
+      'startTime': '2015-04-12T15:00:00.000Z',
+      'endTime': '2015-04-12T23:00:00.000Z',
       'weekday': 6,
       'serviceLocationId': 24503910647,
       'appointmentTypes': [
@@ -184,8 +184,8 @@ const availabilities = {
     {
       'id': 15,
       'owner_id': 235,
-      'startTime': '13:00:00',
-      'endTime': '16:00:00',
+      'startTime': '2015-04-12T24:00:00.000Z',
+      'endTime': '2015-04-13T02:00:00.000Z',
       'weekday': 1,
       'serviceLocationId': 24503910647,
       'appointmentTypes': [

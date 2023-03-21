@@ -342,10 +342,10 @@ export function getStyledAvailabilities ({
   if (!availabilities) return styledAvailabilities;
 
   availabilities.forEach((availability) => {
-    const startTime = availabilityStartAccessor(availability);
+    const startTime = get(availability, availabilityStartAccessor);
     const start = positionFromDate(startTime, min, totalMin);
 
-    const endTime = availabilityEndAccessor(availability);
+    const endTime = get(availability, availabilityEndAccessor);
     const end = positionFromDate(endTime, min, totalMin);
 
     const top = (start / totalMin) * 100;
