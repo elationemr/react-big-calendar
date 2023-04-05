@@ -1,8 +1,10 @@
 import React from 'react';
 import BigCalendar from 'react-big-calendar';
-import Toolbar from './Toolbar';
+import Availability from './Availability';
 import Event from './Event';
+import Toolbar from './Toolbar';
 import physicians, { getPhysicianName } from './data/physicians';
+import { getAvailabilities, getAllAvailabilities } from './data/availabilities';
 import { getAppts, getAllAppts } from './data/appts';
 import eventStyler from './util/eventStyler';
 
@@ -24,21 +26,24 @@ export default class Elation extends React.Component {
 
   state = {
     currentPhysicianId: physicians[0].id,
-    appts: getAppts(physicians[0].id)
+    appts: getAppts(physicians[0].id),
+    availabilities: getAvailabilities(physicians[0].id),
   }
 
   onCurrentPhysicianChange = (event) => {
     const newPhysicianId = Number(event.target.value);
     this.setState({
       currentPhysicianId: newPhysicianId,
-      appts: getAppts(newPhysicianId)
+      appts: getAppts(newPhysicianId),
+      availabilities: getAvailabilities(newPhysicianId),
     });
   }
 
   onRefresh = () => {
     console.log('Refreshing!'); // eslint-disable-line no-console
     this.setState({
-      appts: getAppts(this.state.currentPhysicianId)
+      appts: getAppts(this.state.currentPhysicianId),
+      availabilities: getAvailabilities(this.state.currentPhysicianId),
     })
   }
 
@@ -58,6 +63,9 @@ export default class Elation extends React.Component {
     return (
       <BigCalendar
         {...this.props}
+        availabilities={this.state.availabilities}
+        availabilityMap={getAllAvailabilities()}
+        availabilityKeyAccessor="id"
         events={this.state.appts}
         eventMap={getAllAppts()}
         entities={physicians}
@@ -83,10 +91,13 @@ export default class Elation extends React.Component {
         titleAccessor="_patientName"
         startAccessor={(event) => new Date(event._apptTime)}
         endAccessor={(event) => new Date(event._apptEnd)}
+        availabilityStartAccessor={(availability) => new Date(availability.startTime)}
+        availabilityEndAccessor={(availability) => new Date(availability.endTime)}
         drilldownView={null}
         components={{
           toolbar: Toolbar,
-          event: Event
+          event: Event,
+          availability: Availability,
         }}
         componentProps={{
           toolbar: {

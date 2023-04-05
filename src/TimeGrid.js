@@ -16,7 +16,7 @@ import message from './utils/messages';
 
 import { accessor, dateFormat } from './utils/propTypes';
 
-import { notify, isAllDayEvent, makeEventFilter } from './utils/helpers';
+import { notify, isAllDayEvent, makeEventOrAvailabilityFilter } from './utils/helpers';
 
 import { inRange, sortEvents, segStyle } from './utils/eventLevels';
 
@@ -24,6 +24,7 @@ export default class TimeGrid extends Component {
 
   static propTypes = {
     view: PropTypes.string.isRequired,
+    availabilities: PropTypes.array,
     events: PropTypes.array.isRequired,
     singleDayEventsOnly: PropTypes.bool,
 
@@ -45,6 +46,8 @@ export default class TimeGrid extends Component {
 
     titleAccessor: accessor.isRequired,
     allDayAccessor: accessor.isRequired,
+    availabilityStartAccessor: accessor,
+    availabilityEndAccessor: accessor,
     startAccessor: accessor.isRequired,
     endAccessor: accessor.isRequired,
 
@@ -181,24 +184,38 @@ export default class TimeGrid extends Component {
             className='rbc-time-gutter'
           />
 
-          {this.renderEvents(range, rangeEvents, this.props.now)}
+          {this.renderEventsAndAvailabilities(range, rangeEvents, this.props.now)}
 
         </div>
       </div>
     );
   }
 
-  renderEvents(range, events, today){
-    let { min, max, endAccessor, startAccessor, components } = this.props;
+  renderEventsAndAvailabilities(range, events, today){
+    const {
+      availabilities,
+      availabilityStartAccessor,
+      availabilityEndAccessor,
+      min,
+      max,
+      endAccessor,
+      startAccessor,
+      components
+    } = this.props;
 
     return range.map((date, idx) => {
-      let daysEvents = events.filter(makeEventFilter(date, { startAccessor, endAccessor }));
+      const daysEvents = events.filter(makeEventOrAvailabilityFilter(date, startAccessor, endAccessor));
+      const daysAvailabilities = (availabilities || []).filter(
+        makeEventOrAvailabilityFilter(date, availabilityStartAccessor, availabilityEndAccessor)
+      );
 
       return (
         <DayColumn
           {...this.props }
           min={dates.merge(date, min)}
           max={dates.merge(date, max)}
+          availabilityComponent={components.availability}
+          availabilityWrapperComponent={components.availabilityWrapper}
           eventComponent={components.event}
           eventWrapperComponent={components.eventWrapper}
           dayWrapperComponent={components.dayWrapper}
@@ -207,6 +224,7 @@ export default class TimeGrid extends Component {
           key={idx}
           date={date}
           events={daysEvents}
+          availabilities={daysAvailabilities}
         />
       )
     })

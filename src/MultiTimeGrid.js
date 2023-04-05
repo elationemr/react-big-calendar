@@ -13,7 +13,7 @@ import scrollbarSize from 'dom-helpers/util/scrollbarSize';
 
 import { accessor, dateFormat } from './utils/propTypes';
 
-import { notify, isAllDayEvent, makeEventFilter } from './utils/helpers';
+import { notify, isAllDayEvent, makeEventOrAvailabilityFilter } from './utils/helpers';
 
 import { accessor as get } from './utils/accessors';
 
@@ -23,6 +23,7 @@ export default class MultiTimeGrid extends Component {
 
   static propTypes = {
     view: PropTypes.string.isRequired,
+    availabilityMap: PropTypes.object,
     eventMap: PropTypes.object.isRequired,
     entities: PropTypes.array.isRequired,
     entityKeyAccessor: PropTypes.string.isRequired,
@@ -45,6 +46,8 @@ export default class MultiTimeGrid extends Component {
 
     titleAccessor: accessor.isRequired,
     allDayAccessor: accessor.isRequired,
+    availabilityStartAccessor: accessor,
+    availabilityEndAccessor: accessor,
     startAccessor: accessor.isRequired,
     endAccessor: accessor.isRequired,
 
@@ -216,25 +219,43 @@ export default class MultiTimeGrid extends Component {
           >
             {/* dummy div replacement for timeIndicator to keep css working */}
             <div style={{ display: 'none' }} />
-            {this.renderEvents(date, this.rangeEventsMap, this.props.now)}
+            {this.renderEventsAndAvailabilities(date, this.rangeEventsMap, this.props.now)}
           </div>
         </div>
       </div>
     );
   }
 
-  renderEvents(date, rangeEventsMap /* , today */){
-    let { min, max, endAccessor, startAccessor, components } = this.props;
+  renderEventsAndAvailabilities(date, rangeEventsMap /* , today */){
+    const {
+      min,
+      max,
+      endAccessor,
+      startAccessor,
+      components,
+      availabilityMap,
+      availabilityStartAccessor,
+      availabilityEndAccessor,
+    } = this.props;
 
     return this.props.selectedEntityKeys.map((selectedEntityKey, idx) => {
       let daysEvents = rangeEventsMap[selectedEntityKey] || [];
-      daysEvents = daysEvents.filter(makeEventFilter(date, { startAccessor, endAccessor }));
+      daysEvents = daysEvents.filter(makeEventOrAvailabilityFilter(date, startAccessor, endAccessor));
+      const availabilities = (
+        availabilityMap && availabilityMap[selectedEntityKey] || []
+      );
+      const daysAvailabilities = availabilities.filter(
+        makeEventOrAvailabilityFilter(date, availabilityStartAccessor, availabilityEndAccessor)
+      );
 
       return (
         <DayColumn
           {...this.props }
           min={dates.merge(date, min)}
           max={dates.merge(date, max)}
+          availabilityComponent={components.availability}
+          availabilityWrapperComponent={components.availabilityWrapper}
+          availabilities={daysAvailabilities}
           eventComponent={components.event}
           eventWrapperComponent={components.eventWrapper}
           dayWrapperComponent={components.dayWrapper}

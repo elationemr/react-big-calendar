@@ -13,7 +13,7 @@ import { accessor, elementType, dateFormat } from './utils/propTypes';
 import { accessor as get } from './utils/accessors';
 import { isDaylightSavingsSpring } from './utils/daylightSavings';
 
-import getStyledEvents, { positionFromDate, startsBefore } from './utils/dayViewLayout'
+import getStyledEvents, { getStyledAvailabilities, positionFromDate, startsBefore } from './utils/dayViewLayout'
 
 import TimeColumn from './TimeColumn'
 
@@ -30,6 +30,8 @@ function startsAfter(date, max) {
 
 class DaySlot extends React.Component {
   static propTypes = {
+    availabilities: PropTypes.array,
+    availabilityKeyAccessor: PropTypes.string,
     events: PropTypes.array.isRequired,
     entityKeyAccessor: PropTypes.string,
     step: PropTypes.number.isRequired,
@@ -38,12 +40,15 @@ class DaySlot extends React.Component {
     max: PropTypes.instanceOf(Date).isRequired,
     now: PropTypes.instanceOf(Date),
     nowTimezone: PropTypes.string,
+    date: PropTypes.instanceOf(Date),
 
     rtl: PropTypes.bool,
     titleAccessor: accessor,
     allDayAccessor: accessor.isRequired,
     startAccessor: accessor.isRequired,
     endAccessor: accessor.isRequired,
+    availabilityStartAccessor: accessor,
+    availabilityEndAccessor: accessor,
 
     selectRangeFormat: dateFormat,
     eventTimeRangeFormat: dateFormat,
@@ -64,6 +69,14 @@ class DaySlot extends React.Component {
     dayWrapperComponent: elementType,
     eventComponent: elementType,
     eventWrapperComponent: elementType.isRequired,
+
+    componentProps: PropTypes.shape({
+      event: PropTypes.object,
+      toolbar: PropTypes.object,
+    }),
+
+    availabilityComponent: elementType,
+    availabilityWrapperComponent: elementType,
 
     // internal prop used to make slight changes in rendering
     isMultiGrid: PropTypes.bool,
@@ -127,6 +140,7 @@ class DaySlot extends React.Component {
         step={step}
         isMultiGrid={isMultiGrid}
       >
+        {this.renderAvailabilities()}
         {this.renderEvents()}
 
         {selecting &&
@@ -139,6 +153,47 @@ class DaySlot extends React.Component {
       </TimeColumn>
     );
   }
+
+  renderAvailabilities = () => {
+    const {
+      availabilities,
+      availabilityComponent,
+      availabilityWrapperComponent: AvailabilityWrapper,
+      availabilityStartAccessor,
+      availabilityEndAccessor,
+      availabilityKeyAccessor,
+      min,
+    } = this.props;
+    const AvailabilityComponent = availabilityComponent;
+    const styledAvailabilities = getStyledAvailabilities({
+      availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin: this._totalMin
+    });
+
+    return styledAvailabilities.map(({availability, style}, idx) => {
+      const { height, top } = style;
+      const key = availabilityKeyAccessor && availability[availabilityKeyAccessor]
+        ? availability[availabilityKeyAccessor]
+        : `avbl_${idx}`;
+
+      return (
+        <AvailabilityWrapper key={key}>
+          <div
+            className='rbc-availability'
+            style={{
+              top: `${top}%`,
+              height: `${height}%`,
+            }}
+          >
+            <div className='rbc-availability-content'>
+              {AvailabilityComponent && (
+                <AvailabilityComponent availability={availability} />
+              )}
+            </div>
+          </div>
+        </AvailabilityWrapper>
+      );
+    });
+  };
 
   renderEvents = () => {
     let {

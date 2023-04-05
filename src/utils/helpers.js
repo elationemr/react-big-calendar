@@ -46,15 +46,15 @@ export function isAllDayEvent(event, { startAccessor, endAccessor, allDayAccesso
 }
 
 /**
- * Returns a filter function that returns true if an event should be rendered
+ * Returns a filter function that returns true if an event or availability should be rendered
  * in the specified date's day column.
  */
-export function makeEventFilter(date, { startAccessor, endAccessor }) {
-  return function filterDayEvents(event) {
-    const start = get(event, startAccessor);
+export function makeEventOrAvailabilityFilter(date, startAccessor, endAccessor) {
+  return function filterDayEventsOrAvailabilities(eventOrAvailability) {
+    const start = get(eventOrAvailability, startAccessor);
     return dates.inRange(date,
       start,
-      get(event, endAccessor), 'day'
+      get(eventOrAvailability, endAccessor), 'day'
     ) && dates.eq(date, start, 'day') // ignore back end of long range events for now
   }
 }

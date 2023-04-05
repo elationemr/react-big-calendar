@@ -328,3 +328,34 @@ export default function getStyledEvents ({
 
   return styledEvents
 }
+
+/**
+ * Takes an array of availabilies and returns an array
+ * containing the same availabilies, but with an additional style property.
+ *
+ */
+export function getStyledAvailabilities ({
+  availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin
+}) {
+  let styledAvailabilities = [];
+
+  if (!availabilities) return styledAvailabilities;
+
+  availabilities.forEach((availability) => {
+    const startTime = get(availability, availabilityStartAccessor);
+    const start = positionFromDate(startTime, min, totalMin);
+
+    const endTime = get(availability, availabilityEndAccessor);
+    const end = positionFromDate(endTime, min, totalMin);
+
+    const top = (start / totalMin) * 100;
+    const bottom = (end / totalMin) * 100;
+    const height = bottom - top;
+
+    const style = { top, height };
+
+    styledAvailabilities.push({ availability, style });
+  })
+
+  return styledAvailabilities;
+}
