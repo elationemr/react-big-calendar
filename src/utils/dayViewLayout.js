@@ -335,25 +335,28 @@ export default function getStyledEvents ({
  *
  */
 export function getStyledAvailabilities ({
-  availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin
+  availabilities,
+  availabilityStartAccessor,
+  availabilityEndAccessor,
+  min,
+  step,
+  totalMin,
 }) {
   let styledAvailabilities = [];
 
   if (!availabilities) return styledAvailabilities;
 
-  availabilities.forEach((availability) => {
-    const startTime = get(availability, availabilityStartAccessor);
-    const start = positionFromDate(startTime, min, totalMin);
+  const helperArgs = {
+    events: availabilities,
+    startAccessor: availabilityStartAccessor,
+    endAccessor: availabilityEndAccessor,
+    min,
+    step,
+    totalMin,
+  };
 
-    const endTime = get(availability, availabilityEndAccessor);
-    const end = positionFromDate(endTime, min, totalMin);
-
-    const top = (start / totalMin) * 100;
-    const bottom = (end / totalMin) * 100;
-    const height = bottom - top;
-
-    const style = { top, height };
-
+  availabilities.forEach((availability, availabilityIdx) => {
+    let style = getYStyles(availabilityIdx, helperArgs);
     styledAvailabilities.push({ availability, style });
   })
 
