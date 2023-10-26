@@ -163,10 +163,16 @@ class DaySlot extends React.Component {
       availabilityEndAccessor,
       availabilityKeyAccessor,
       min,
+      step,
     } = this.props;
     const AvailabilityComponent = availabilityComponent;
     const styledAvailabilities = getStyledAvailabilities({
-      availabilities, availabilityStartAccessor, availabilityEndAccessor, min, totalMin: this._totalMin
+      availabilities,
+      availabilityStartAccessor,
+      availabilityEndAccessor,
+      min,
+      step,
+      totalMin: this._totalMin,
     });
 
     return styledAvailabilities.map(({availability, style}, idx) => {
