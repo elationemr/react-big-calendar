@@ -176,7 +176,7 @@ class DaySlot extends React.Component {
     });
 
     return styledAvailabilities.map(({availability, style}, idx) => {
-      const { height, top } = style;
+      const { height, isOverlap, top, xOffset } = style;
       const key = availabilityKeyAccessor && availability[availabilityKeyAccessor]
         ? availability[availabilityKeyAccessor]
         : `avbl_${idx}`;
@@ -184,10 +184,11 @@ class DaySlot extends React.Component {
       return (
         <AvailabilityWrapper key={key}>
           <div
-            className='rbc-availability'
+            className={cn('rbc-availability', isOverlap && 'rbc-availability-overlap')}
             style={{
               top: `${top}%`,
               height: `${height}%`,
+              left:  xOffset,
             }}
           >
             <div className='rbc-availability-content'>

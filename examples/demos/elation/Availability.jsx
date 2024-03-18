@@ -7,9 +7,19 @@ export default class Availability extends React.Component {
   }
 
   render() {
-    const { availability} = this.props;
+    const { availability } = this.props;
     const nowStartTime = new Date(availability.startTime);
     const nowEndTime = new Date(availability.endTime);
+
+    const isOVerlap = availability.overlapIds.length;
+
+    if (isOVerlap) {
+      return (
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+          <strong>𖠽</strong>
+        </div>
+      )
+    }
 
     return (
       <div style={{display: 'flex', fontSize: 12, justifyContent: 'space-between', padding: '15px 10px'}}>

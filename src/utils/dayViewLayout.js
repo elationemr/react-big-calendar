@@ -335,7 +335,7 @@ export default function getStyledEvents ({
  *
  */
 export function getStyledAvailabilities ({
-  availabilities,
+  availabilities: unsortedAvailabilities,
   availabilityStartAccessor,
   availabilityEndAccessor,
   min,
@@ -343,8 +343,11 @@ export function getStyledAvailabilities ({
   totalMin,
 }) {
   let styledAvailabilities = [];
+  if (!unsortedAvailabilities) return styledAvailabilities;
 
-  if (!availabilities) return styledAvailabilities;
+  let availabilities = unsortedAvailabilities.sort((a, b) =>
+    new Date(get(a, availabilityStartAccessor)) - new Date(get(b, availabilityStartAccessor)) || new Date(get(a, availabilityEndAccessor)) - new Date(get(a, availabilityEndAccessor))
+  );
 
   const helperArgs = {
     events: availabilities,
@@ -355,10 +358,56 @@ export function getStyledAvailabilities ({
     totalMin,
   };
 
-  availabilities.forEach((availability, availabilityIdx) => {
-    let style = getYStyles(availabilityIdx, helperArgs);
-    styledAvailabilities.push({ availability, style });
-  })
+  const overlapMap = new Map();
+  let columnIndex = 0;
+
+  for (const availability of availabilities) {
+    let grouped = false;
+
+    // Check for overlap with existing groups
+    for (const [_, group] of overlapMap.entries()) {
+      const lastAvailability = group[group.length - 1];
+      const lastAvailabilityEndTime = get(lastAvailability, availabilityEndAccessor);
+      const availabilityStartTime = get(availability, availabilityStartAccessor);
+      if (lastAvailabilityEndTime <= availabilityStartTime) {
+        // No overlap, add to current group
+        group.push(availability);
+        grouped = true;
+        break;
+      }
+    }
+
+    if (!grouped) {
+      // Create a new group
+      overlapMap.set(columnIndex, [availability]);
+      columnIndex++;
+    }
+  }
+
+  const overlapGroups = Array.from(overlapMap.entries());
+
+  for (const [columnIndex, group] of overlapMap.entries()) {
+    group.forEach((availability) => {
+      const isOverlap = overlapMap.size > 1 &&
+        overlapGroups.some(([otherGroupIndex, otherGroup]) =>
+          otherGroupIndex !== columnIndex &&
+          otherGroup.some(otherAvailability =>
+            otherAvailability &&
+            get(otherAvailability, availabilityEndAccessor) > get(availability, availabilityStartAccessor) &&
+            get(otherAvailability, availabilityStartAccessor) < get(availability, availabilityEndAccessor)
+          )
+        );
+
+      styledAvailabilities.push({
+        availability,
+        style: {
+          ...getYStyles(availabilities.indexOf(availability), helperArgs),
+          xOffset: overlapMap.size > 1 ? columnIndex * 25 : undefined,
+          isOverlap,
+        },
+      });
+    });
+  }
 
   return styledAvailabilities;
 }
