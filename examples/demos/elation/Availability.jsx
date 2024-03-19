@@ -4,16 +4,17 @@ import React from 'react';
 export default class Availability extends React.Component {
   static propTypes = {
     availability: PropTypes.object,
+    isMultiColumn: PropTypes.bool,
   }
 
   render() {
-    const { availability } = this.props;
+    const { availability, isMultiColumn } = this.props;
     const nowStartTime = new Date(availability.startTime);
     const nowEndTime = new Date(availability.endTime);
 
-    const isOVerlap = availability.overlapIds.length;
+    // const isOVerlap = availability.overlapIds.length;
 
-    if (isOVerlap) {
+    if (isMultiColumn) {
       return (
         <div style={{display: 'flex', justifyContent: 'center'}}>
           <strong>𖠽</strong>

@@ -384,26 +384,15 @@ export function getStyledAvailabilities ({
     }
   }
 
-  const overlapGroups = Array.from(overlapMap.entries());
-
   for (const [columnIndex, group] of overlapMap.entries()) {
     group.forEach((availability) => {
-      const isOverlap = overlapMap.size > 1 &&
-        overlapGroups.some(([otherGroupIndex, otherGroup]) =>
-          otherGroupIndex !== columnIndex &&
-          otherGroup.some(otherAvailability =>
-            otherAvailability &&
-            get(otherAvailability, availabilityEndAccessor) > get(availability, availabilityStartAccessor) &&
-            get(otherAvailability, availabilityStartAccessor) < get(availability, availabilityEndAccessor)
-          )
-        );
-
+      const isMultiColumn = overlapMap.size > 1;
       styledAvailabilities.push({
         availability,
         style: {
           ...getYStyles(availabilities.indexOf(availability), helperArgs),
           xOffset: overlapMap.size > 1 ? columnIndex * 25 : undefined,
-          isOverlap,
+          isMultiColumn,
         },
       });
     });
