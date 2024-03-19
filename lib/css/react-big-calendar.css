@@ -174,13 +174,18 @@ button.rbc-input::-moz-focus-inner {
 .rbc-btn-group + button {
   margin-left: 10px;
 }
-.rbc-availability {
+.rbc-availability,
+.rbc-availability-overlap {
   background-color: rgba(228, 234, 236, 0.5);
   border: 1px solid rgba(131, 152, 160, 0.5);
   border-radius: 5px;
   color: #253A40;
   padding: 2px 5px;
   width: 96%;
+}
+.rbc-availability-overlap {
+  width: 20px;
+  padding: 0;
 }
 .rbc-event {
   cursor: pointer;
