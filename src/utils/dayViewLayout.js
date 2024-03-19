@@ -358,14 +358,18 @@ export function getStyledAvailabilities ({
     totalMin,
   };
 
-  const overlapMap = new Map();
+  const overlapMap = {};
   let columnIndex = 0;
 
-  for (const availability of availabilities) {
+  for (let availabilityIndex = 0; availabilityIndex < availabilities.length; availabilityIndex++) {
+    const availability = availabilities[availabilityIndex];
     let grouped = false;
 
     // Check for overlap with existing groups
-    for (const [_, group] of overlapMap.entries()) {
+    const overlapKeys = Object.keys(overlapMap);
+    for (let groupIndex = 0; groupIndex < overlapKeys.length; groupIndex++) {
+      const groupKey = overlapKeys[groupIndex];
+      const group = overlapMap[groupKey];
       const lastAvailability = group[group.length - 1];
       const lastAvailabilityEndTime = get(lastAvailability, availabilityEndAccessor);
       const availabilityStartTime = get(availability, availabilityStartAccessor);
@@ -379,23 +383,30 @@ export function getStyledAvailabilities ({
 
     if (!grouped) {
       // Create a new group
-      overlapMap.set(columnIndex, [availability]);
+      overlapMap[columnIndex] = [availability];
       columnIndex++;
     }
   }
 
-  for (const [columnIndex, group] of overlapMap.entries()) {
-    group.forEach((availability) => {
-      const isMultiColumn = overlapMap.size > 1;
+  const overlapKeys = Object.keys(overlapMap);
+  for (let groupIndex = 0; groupIndex < overlapKeys.length; groupIndex++) {
+    const columnIndex = overlapKeys[groupIndex];
+    const group = overlapMap[columnIndex];
+    for (let availabilityIndex = 0; availabilityIndex < group.length; availabilityIndex++) {
+      const availability = group[availabilityIndex];
+      const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs)
+      const isMultiColumn = Object.keys(overlapMap).length > 1;
+      const xOffset = isMultiColumn ? groupIndex * 25 : undefined;
       styledAvailabilities.push({
-        availability,
+        availability: availability,
         style: {
-          ...getYStyles(availabilities.indexOf(availability), helperArgs),
-          xOffset: overlapMap.size > 1 ? columnIndex * 25 : undefined,
+          height,
+          top,
           isMultiColumn,
-        },
+          xOffset,
+        }
       });
-    });
+    }
   }
 
   return styledAvailabilities;

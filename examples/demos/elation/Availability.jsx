@@ -12,8 +12,6 @@ export default class Availability extends React.Component {
     const nowStartTime = new Date(availability.startTime);
     const nowEndTime = new Date(availability.endTime);
 
-    // const isOVerlap = availability.overlapIds.length;
-
     if (isMultiColumn) {
       return (
         <div style={{display: 'flex', justifyContent: 'center'}}>
