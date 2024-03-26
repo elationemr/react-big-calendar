@@ -345,8 +345,11 @@ export function getStyledAvailabilities ({
   let styledAvailabilities = [];
   if (!unsortedAvailabilities) return styledAvailabilities;
 
-  let availabilities = unsortedAvailabilities.sort((a, b) =>
-    new Date(get(a, availabilityStartAccessor)) - new Date(get(b, availabilityStartAccessor)) || new Date(get(a, availabilityEndAccessor)) - new Date(get(a, availabilityEndAccessor))
+  let availabilities = unsortedAvailabilities
+    .slice()
+    .sort((a, b) =>
+      new Date(get(a, availabilityStartAccessor)) - new Date(get(b, availabilityStartAccessor)) ||
+      new Date(get(a, availabilityEndAccessor)) - new Date(get(a, availabilityEndAccessor))
   );
 
   const helperArgs = {
@@ -358,45 +361,40 @@ export function getStyledAvailabilities ({
     totalMin,
   };
 
-  const overlapMap = {};
+  const availabilitiesByColumn = {};
   let columnIndex = 0;
 
-  for (let availabilityIndex = 0; availabilityIndex < availabilities.length; availabilityIndex++) {
-    const availability = availabilities[availabilityIndex];
-    let grouped = false;
+  availabilities.forEach((availability) => {
+    let placed = false;
 
     // Check for overlap with existing groups
-    const overlapKeys = Object.keys(overlapMap);
-    for (let groupIndex = 0; groupIndex < overlapKeys.length; groupIndex++) {
-      const groupKey = overlapKeys[groupIndex];
-      const group = overlapMap[groupKey];
+    const columnIndexes = Object.keys(availabilitiesByColumn);
+    for (let groupIndex = 0; groupIndex < columnIndexes.length; groupIndex++) {
+      const groupKey = columnIndexes[groupIndex];
+      const group = availabilitiesByColumn[groupKey];
       const lastAvailability = group[group.length - 1];
       const lastAvailabilityEndTime = get(lastAvailability, availabilityEndAccessor);
       const availabilityStartTime = get(availability, availabilityStartAccessor);
       if (lastAvailabilityEndTime <= availabilityStartTime) {
         // No overlap, add to current group
         group.push(availability);
-        grouped = true;
+        placed = true;
         break;
       }
     }
 
-    if (!grouped) {
+    if (!placed) {
       // Create a new group
-      overlapMap[columnIndex] = [availability];
+      availabilitiesByColumn[columnIndex] = [availability];
       columnIndex++;
     }
-  }
+  });
 
-  const overlapKeys = Object.keys(overlapMap);
-  for (let groupIndex = 0; groupIndex < overlapKeys.length; groupIndex++) {
-    const columnIndex = overlapKeys[groupIndex];
-    const group = overlapMap[columnIndex];
-    for (let availabilityIndex = 0; availabilityIndex < group.length; availabilityIndex++) {
-      const availability = group[availabilityIndex];
-      const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs)
-      const isMultiColumn = Object.keys(overlapMap).length > 1;
-      const xOffset = isMultiColumn ? groupIndex * 25 : undefined;
+  Object.entries(availabilitiesByColumn).forEach(([columnIndex, group]) => {
+    group.forEach((availability) => {
+      const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs);
+      const isMultiColumn = Object.keys(availabilitiesByColumn).length > 1;
+      const xOffset = isMultiColumn ? columnIndex * 25 : undefined;
       styledAvailabilities.push({
         availability: availability,
         style: {
@@ -406,8 +404,8 @@ export function getStyledAvailabilities ({
           xOffset,
         }
       });
-    }
-  }
+    });
+  });
 
   return styledAvailabilities;
 }

@@ -180,6 +180,8 @@ button.rbc-input::-moz-focus-inner {
   border: 1px solid rgba(131, 152, 160, 0.5);
   border-radius: 5px;
   color: #253A40;
+}
+.rbc-availability {
   padding: 2px 5px;
   width: 96%;
 }
