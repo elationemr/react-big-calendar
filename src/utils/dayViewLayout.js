@@ -349,7 +349,7 @@ export function getStyledAvailabilities ({
     .slice()
     .sort((a, b) =>
       new Date(get(a, availabilityStartAccessor)) - new Date(get(b, availabilityStartAccessor)) ||
-      new Date(get(a, availabilityEndAccessor)) - new Date(get(a, availabilityEndAccessor))
+      new Date(get(a, availabilityEndAccessor)) - new Date(get(b, availabilityEndAccessor))
   );
 
   const helperArgs = {
