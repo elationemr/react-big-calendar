@@ -335,7 +335,7 @@ export default function getStyledEvents ({
  *
  */
 export function getStyledAvailabilities ({
-  availabilities,
+  availabilities: unsortedAvailabilities,
   availabilityStartAccessor,
   availabilityEndAccessor,
   min,
@@ -343,8 +343,14 @@ export function getStyledAvailabilities ({
   totalMin,
 }) {
   let styledAvailabilities = [];
+  if (!unsortedAvailabilities) return styledAvailabilities;
 
-  if (!availabilities) return styledAvailabilities;
+  let availabilities = unsortedAvailabilities
+    .slice()
+    .sort((a, b) =>
+      new Date(get(a, availabilityStartAccessor)) - new Date(get(b, availabilityStartAccessor)) ||
+      new Date(get(a, availabilityEndAccessor)) - new Date(get(b, availabilityEndAccessor))
+  );
 
   const helperArgs = {
     events: availabilities,
@@ -355,10 +361,51 @@ export function getStyledAvailabilities ({
     totalMin,
   };
 
-  availabilities.forEach((availability, availabilityIdx) => {
-    let style = getYStyles(availabilityIdx, helperArgs);
-    styledAvailabilities.push({ availability, style });
-  })
+  const availabilitiesByColumn = {};
+  let columnIndex = 0;
+
+  availabilities.forEach((availability) => {
+    let placed = false;
+
+    // Check for overlap with existing groups
+    const columnIndexes = Object.keys(availabilitiesByColumn);
+    for (let groupIndex = 0; groupIndex < columnIndexes.length; groupIndex++) {
+      const groupKey = columnIndexes[groupIndex];
+      const group = availabilitiesByColumn[groupKey];
+      const lastAvailability = group[group.length - 1];
+      const lastAvailabilityEndTime = get(lastAvailability, availabilityEndAccessor);
+      const availabilityStartTime = get(availability, availabilityStartAccessor);
+      if (lastAvailabilityEndTime <= availabilityStartTime) {
+        // No overlap, add to current group
+        group.push(availability);
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      // Create a new group
+      availabilitiesByColumn[columnIndex] = [availability];
+      columnIndex++;
+    }
+  });
+
+  Object.entries(availabilitiesByColumn).forEach(([columnIndex, group]) => {
+    group.forEach((availability) => {
+      const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs);
+      const isMultiColumn = Object.keys(availabilitiesByColumn).length > 1;
+      const xOffset = isMultiColumn ? columnIndex * 25 : undefined;
+      styledAvailabilities.push({
+        availability: availability,
+        style: {
+          height,
+          top,
+          isMultiColumn,
+          xOffset,
+        }
+      });
+    });
+  });
 
   return styledAvailabilities;
 }
