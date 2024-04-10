@@ -59,6 +59,16 @@ export default class Elation extends React.Component {
     alert(`Selected appointment with ${event._patientName} for ${name} starting at ${new Date(event._apptTime).toLocaleString()}`);
   }
 
+  onAvailabilityClick = (availability /*, e*/) => {
+    const name = getPhysicianName(availability.providerId);
+    // eslint-disable-next-line no-undef
+    alert(
+      `Availability clicked for ${name} at location ID ${availability.serviceLocationId} starting at ${new Date(
+        availability.startTime
+      ).toLocaleString()}`
+    );
+  };
+
   render(){
     return (
       <BigCalendar
@@ -109,6 +119,7 @@ export default class Elation extends React.Component {
         selectable
         onSelectSlot={this.onSelectSlot}
         onSelectEvent={this.onSelectEvent}
+        onAvailabilityClick={this.onAvailabilityClick}
       />
     )
   }

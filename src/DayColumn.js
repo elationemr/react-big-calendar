@@ -62,6 +62,7 @@ class DaySlot extends React.Component {
     onSelecting: PropTypes.func,
     onSelectSlot: PropTypes.func.isRequired,
     onSelectEvent: PropTypes.func.isRequired,
+    onAvailabilityClick: PropTypes.func.isRequired,
 
     className: PropTypes.string,
     dragThroughEvents: PropTypes.bool,
@@ -190,6 +191,7 @@ class DaySlot extends React.Component {
               height: `${height}%`,
               left: xOffset,
             }}
+            onClick={(e) => this._onAvailabilityClick(availability, e)}
           >
             <div className='rbc-availability-content'>
               {AvailabilityComponent && (
@@ -402,6 +404,10 @@ class DaySlot extends React.Component {
 
   _select = (...args) => {
     notify(this.props.onSelectEvent, args)
+  };
+
+  _onAvailabilityClick = (...args) => {
+    notify(this.props.onAvailabilityClick, args);
   };
 }
 
