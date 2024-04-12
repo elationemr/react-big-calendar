@@ -201,13 +201,13 @@ class Calendar extends React.Component {
    onSelectEvent: PropTypes.func,
 
    /**
-    * Callback fired when a calendar availability is clicked.
+    * Callback fired when a calendar availability is selected.
     *
     * ```js
     * function(availability: object, e: SyntheticEvent)
     * ```
     */
-   onAvailabilityClick: PropTypes.func,
+   onSelectAvailability: PropTypes.func,
 
    /**
     * Callback fired when dragging a selection in the Time views.
@@ -749,7 +749,7 @@ class Calendar extends React.Component {
          getDrilldownView={this.getDrilldownView}
          onNavigate={this.handleNavigate}
          onDrillDown={this.handleDrillDown}
-         onAvailabilityClick={this.handleAvailabilityClick}
+         onSelectAvailability={this.handleSelectAvailability}
          onSelectEvent={this.handleSelectEvent}
          onSelectSlot={this.handleSelectSlot}
          onShowMore={this._showMore}
@@ -772,8 +772,8 @@ class Calendar extends React.Component {
      this.props.onView(view)
  };
 
- handleAvailabilityClick = (...args) => {
-   notify(this.props.onAvailabilityClick, args)
+ handleSelectAvailability = (...args) => {
+   notify(this.props.onSelectAvailability, args)
  };
 
  handleSelectEvent = (...args) => {
