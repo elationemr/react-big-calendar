@@ -49,15 +49,22 @@ export default class Elation extends React.Component {
 
   onSelectSlot = ({ start, end, entityKey/*, slots */}) => {
     const name = getPhysicianName(entityKey || this.state.currentPhysicianId);
-    // eslint-disable-next-line no-undef
-    alert(`Adding event from ${start.toLocaleString()} to ${end.toLocaleString()} for physician ${name}`);
+    window.alert(`Adding event from ${start.toLocaleString()} to ${end.toLocaleString()} for physician ${name}`);
   }
 
   onSelectEvent = (event/*, e*/) => {
     const name = getPhysicianName(event._physicianUserId);
-    // eslint-disable-next-line no-undef
-    alert(`Selected appointment with ${event._patientName} for ${name} starting at ${new Date(event._apptTime).toLocaleString()}`);
+    window.alert(`Selected appointment with ${event._patientName} for ${name} starting at ${new Date(event._apptTime).toLocaleString()}`);
   }
+
+  onSelectAvailability = (availability /*, e*/) => {
+    const name = getPhysicianName(availability.providerId);
+    window.alert(
+      `Availability clicked for ${name} at location ID ${availability.serviceLocationId} starting at ${new Date(
+        availability.startTime
+      ).toLocaleString()}`
+    );
+  };
 
   render(){
     return (
@@ -109,6 +116,7 @@ export default class Elation extends React.Component {
         selectable
         onSelectSlot={this.onSelectSlot}
         onSelectEvent={this.onSelectEvent}
+        onSelectAvailability={this.onSelectAvailability}
       />
     )
   }
