@@ -12,10 +12,13 @@ export default class TimeSlotGroup extends Component {
     step: PropTypes.number.isRequired,
     value: PropTypes.instanceOf(Date).isRequired,
     showLabels: PropTypes.bool,
+    isMultiGrid: PropTypes.bool,
     isNow: PropTypes.bool,
     timeGutterFormat: PropTypes.string,
     culture: PropTypes.string,
-    height: PropTypes.number
+    height: PropTypes.number,
+    slotPropGetter: PropTypes.func,
+    entityKey: PropTypes.number,
   }
   static defaultProps = {
     timeslots: 2,
@@ -26,6 +29,7 @@ export default class TimeSlotGroup extends Component {
 
   shouldComponentUpdate(nextProps /* , nextState */) {
     if (
+      this.props.value !== nextProps.value ||
       this.props.dayWrapperComponent !== nextProps.dayWrapperComponent ||
       this.props.timeslots !== nextProps.timeslots ||
       this.props.step !== nextProps.step ||
@@ -51,7 +55,7 @@ export default class TimeSlotGroup extends Component {
   }
 
   renderSlice(slotNumber, content, value) {
-    const { dayWrapperComponent, showLabels, isNow, culture } = this.props;
+    const { dayWrapperComponent, entityKey, showLabels, isMultiGrid, isNow, culture, slotPropGetter } = this.props;
     return (
       <TimeSlot
         key={slotNumber}
@@ -59,8 +63,11 @@ export default class TimeSlotGroup extends Component {
         showLabel={showLabels}
         content={content}
         culture={culture}
+        isMultiGrid={isMultiGrid}
         isNow={isNow}
         value={value}
+        slotPropGetter={slotPropGetter}
+        entityKey={entityKey}
       />
     )
   }

@@ -166,6 +166,9 @@ class DaySlot extends React.Component {
       min,
       step,
     } = this.props;
+
+    if (!availabilityComponent) return;
+
     const AvailabilityComponent = availabilityComponent;
     const styledAvailabilities = getStyledAvailabilities({
       availabilities,
@@ -177,7 +180,7 @@ class DaySlot extends React.Component {
     });
 
     return styledAvailabilities.map(({availability, style}, idx) => {
-      const { height, isMultiColumn, top, xOffset } = style;
+      const { height, top, xOffset } = style;
       const key = availabilityKeyAccessor && availability[availabilityKeyAccessor]
         ? availability[availabilityKeyAccessor]
         : `avbl_${idx}`;
@@ -185,7 +188,7 @@ class DaySlot extends React.Component {
       return (
         <AvailabilityWrapper key={key}>
           <div
-            className={cn('rbc-availability', isMultiColumn && 'rbc-availability-overlap')}
+            className='rbc-availability'
             style={{
               top: `${top}%`,
               height: `${height}%`,
@@ -195,7 +198,7 @@ class DaySlot extends React.Component {
           >
             <div className='rbc-availability-content'>
               {AvailabilityComponent && (
-                <AvailabilityComponent availability={availability} isMultiColumn={isMultiColumn} />
+                <AvailabilityComponent availability={availability} />
               )}
             </div>
           </div>

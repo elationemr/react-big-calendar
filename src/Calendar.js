@@ -351,6 +351,20 @@ class Calendar extends React.Component {
    eventPropGetter: PropTypes.func,
 
    /**
+    * Optionally provide a function that returns an object of className or style props
+    * to be applied to the the time slot node.
+    *
+    * ```js
+    * function(
+    * 	slotDate: date,
+    * 	entityKey: number | string,
+    * 	isMultiGrid: bool
+    * ) -> { className: string?, style: object? }
+    * ```
+    */
+  slotPropGetter: PropTypes.func,
+
+   /**
     * Accessor for the event title, used to display event information. Should
     * resolve to a `renderable` value.
     *
