@@ -393,14 +393,12 @@ export function getStyledAvailabilities ({
   Object.entries(availabilitiesByColumn).forEach(([columnIndex, group]) => {
     group.forEach((availability) => {
       const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs);
-      const isMultiColumn = Object.keys(availabilitiesByColumn).length > 1;
-      const xOffset = isMultiColumn ? columnIndex * 25 : undefined;
+      const xOffset = columnIndex * 20;
       styledAvailabilities.push({
         availability: availability,
         style: {
           height,
           top,
-          isMultiColumn,
           xOffset,
         }
       });
