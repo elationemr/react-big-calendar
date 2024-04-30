@@ -1,6 +1,35 @@
 const availabilities = {
   28716: [
     {
+      'id': 4,
+      'providerId': 28716,
+      'startTime': '2015-04-16T10:00:00.000Z',
+      'endTime': '2015-04-16T16:00:00.000Z',
+      'serviceLocationId': 24503910647,
+      'weekday': 1,
+      'appointmentTypes': [
+        {
+          'id': 53630009449,
+          'model_class': 'AppointmentType',
+          'abbreviation': 'Phys',
+          'name': 'Physical Exam',
+        },
+        {
+          'id': 53630074985,
+          'model_class': 'AppointmentType',
+          'abbreviation': null,
+          'name': 'Walk-in',
+        },
+        {
+          'id': 53630074986,
+          'model_class': 'AppointmentType',
+          'abbreviation': null,
+          'name': 'Walk-in',
+        },
+      ],
+      'overlapIds': [],
+    },
+    {
       'id': 5,
       'providerId': 28716,
       'startTime': '2015-04-12T10:00:00.000Z',
@@ -89,6 +118,7 @@ const availabilities = {
     },
     {
       'id': 8,
+      'providerId': 28716,
       'startTime': '2015-04-12T11:30:00.000Z',
       'endTime': '2015-04-12T13:00:00.000Z',
       'serviceLocationId': 24503910647,

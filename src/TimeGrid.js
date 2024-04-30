@@ -38,6 +38,7 @@ export default class TimeGrid extends Component {
 
     scrollToTime: PropTypes.instanceOf(Date),
     eventPropGetter: PropTypes.func,
+    slotPropGetter: PropTypes.func,
     dayFormat: dateFormat,
     culture: PropTypes.string,
 

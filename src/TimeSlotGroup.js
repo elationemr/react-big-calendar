@@ -7,15 +7,19 @@ import { elementType } from './utils/propTypes'
 
 export default class TimeSlotGroup extends Component {
   static propTypes = {
+    availabilities: PropTypes.array,
     dayWrapperComponent: elementType,
     timeslots: PropTypes.number.isRequired,
     step: PropTypes.number.isRequired,
     value: PropTypes.instanceOf(Date).isRequired,
     showLabels: PropTypes.bool,
+    isMultiGrid: PropTypes.bool,
     isNow: PropTypes.bool,
     timeGutterFormat: PropTypes.string,
     culture: PropTypes.string,
-    height: PropTypes.number
+    height: PropTypes.number,
+    slotPropGetter: PropTypes.func,
+    entityKey: PropTypes.number,
   }
   static defaultProps = {
     timeslots: 2,
@@ -42,7 +46,8 @@ export default class TimeSlotGroup extends Component {
       // The exception to the above observation is for the label column on the left
       // of the calendar, which is why we will re-render on value updates for
       // *only* those columns in particular.
-      this.props.showLabels && date.neq(this.props.value, nextProps.value)
+      this.props.showLabels && date.neq(this.props.value, nextProps.value) ||
+      (!this.props.showLabels && this.props.availabilities !== nextProps.availabilities)
     ) {
       return true;
     }
@@ -51,7 +56,7 @@ export default class TimeSlotGroup extends Component {
   }
 
   renderSlice(slotNumber, content, value) {
-    const { dayWrapperComponent, showLabels, isNow, culture } = this.props;
+    const { dayWrapperComponent, entityKey, showLabels, isMultiGrid, isNow, culture, slotPropGetter } = this.props;
     return (
       <TimeSlot
         key={slotNumber}
@@ -59,8 +64,11 @@ export default class TimeSlotGroup extends Component {
         showLabel={showLabels}
         content={content}
         culture={culture}
+        isMultiGrid={isMultiGrid}
         isNow={isNow}
         value={value}
+        slotPropGetter={slotPropGetter}
+        entityKey={entityKey}
       />
     )
   }

@@ -174,20 +174,16 @@ button.rbc-input::-moz-focus-inner {
 .rbc-btn-group + button {
   margin-left: 10px;
 }
-.rbc-availability,
-.rbc-availability-overlap {
-  background-color: rgba(228, 234, 236, 0.5);
-  border: 1px solid rgba(131, 152, 160, 0.5);
-  border-radius: 5px;
-  color: #253A40;
-}
 .rbc-availability {
-  padding: 2px 5px;
-  width: 96%;
-}
-.rbc-availability-overlap {
-  width: 20px;
+  background-color: rgba(205, 215, 219, 0.5);
+  border: 0;
+  border-radius: 2px;
+  color: #253A40;
   padding: 0;
+  width: 16px;
+}
+.rbc-availability-selectable {
+  cursor: pointer;
 }
 .rbc-event {
   cursor: pointer;
@@ -426,6 +422,9 @@ button.rbc-input::-moz-focus-inner {
   -ms-flex: none;
       flex: none;
 }
+.rbc-time-gutter {
+  background: #fff;
+}
 .rbc-time-gutter .rbc-label {
   text-align: right;
 }
@@ -564,6 +563,7 @@ button.rbc-input::-moz-focus-inner {
   border-top: 2px solid #DDD;
   overflow-y: auto;
   position: relative;
+  background: repeating-linear-gradient(-45deg, #F8F9FA, #F8F9FA 4px, #F0F3F4 6px, #F0F3F4 8px);
 }
 .rbc-time-content > .rbc-time-gutter {
   -ms-flex: none;

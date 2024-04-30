@@ -7,6 +7,7 @@ import physicians, { getPhysicianName } from './data/physicians';
 import { getAvailabilities, getAllAvailabilities } from './data/availabilities';
 import { getAppts, getAllAppts } from './data/appts';
 import eventStyler from './util/eventStyler';
+import slotStyler from './util/slotStyler';
 
 
 const formats = {
@@ -79,6 +80,7 @@ export default class Elation extends React.Component {
         entityKeyAccessor="id"
         entityNameAccessor="fullName"
         eventPropGetter={eventStyler}
+        slotPropGetter={slotStyler}
         selectedEntityKeys={[28716, 25454, 235]}
         singleDayEventsOnly
         formats={formats}
