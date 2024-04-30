@@ -28,7 +28,7 @@ export default class TimeSlot extends Component {
     const Wrapper = this.props.dayWrapperComponent;
     let availableClassName;
     let availableStyle;
-    if (slotPropGetter) {
+    if (slotPropGetter && !this.props.showLabel) {
       const { className, style } = slotPropGetter(value, entityKey, isMultiGrid) || {};
       availableClassName = className;
       availableStyle = style;
@@ -43,7 +43,7 @@ export default class TimeSlot extends Component {
             !this.props.showLabel && availableClassName,
             this.props.isNow && 'rbc-now',
           )}
-          style={{...(!this.props.showLabel ? availableStyle : {})}}
+          style={availableStyle}
         >
         {this.props.showLabel &&
           <span>{this.props.content}</span>

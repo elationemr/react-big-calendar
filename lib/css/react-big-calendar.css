@@ -179,9 +179,11 @@ button.rbc-input::-moz-focus-inner {
   border: 0;
   border-radius: 2px;
   color: #253A40;
-  cursor: pointer;
   padding: 0;
   width: 16px;
+}
+.rbc-availability-selectable {
+  cursor: pointer;
 }
 .rbc-event {
   cursor: pointer;

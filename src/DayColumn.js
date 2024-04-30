@@ -164,6 +164,7 @@ class DaySlot extends React.Component {
       availabilityEndAccessor,
       availabilityKeyAccessor,
       min,
+      onSelectAvailability,
       step,
     } = this.props;
 
@@ -188,7 +189,7 @@ class DaySlot extends React.Component {
       return (
         <AvailabilityWrapper key={key}>
           <div
-            className='rbc-availability'
+            className={cn('rbc-availability', onSelectAvailability && 'rbc-availability-selectable')}
             style={{
               top: `${top}%`,
               height: `${height}%`,

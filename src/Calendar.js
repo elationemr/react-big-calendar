@@ -763,7 +763,6 @@ class Calendar extends React.Component {
          getDrilldownView={this.getDrilldownView}
          onNavigate={this.handleNavigate}
          onDrillDown={this.handleDrillDown}
-         onSelectAvailability={this.handleSelectAvailability}
          onSelectEvent={this.handleSelectEvent}
          onSelectSlot={this.handleSelectSlot}
          onShowMore={this._showMore}
@@ -784,10 +783,6 @@ class Calendar extends React.Component {
  handleViewChange = (view) => {
    if (view !== this.props.view && isValidView(view, this.props))
      this.props.onView(view)
- };
-
- handleSelectAvailability = (...args) => {
-   notify(this.props.onSelectAvailability, args)
  };
 
  handleSelectEvent = (...args) => {
