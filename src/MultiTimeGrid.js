@@ -171,7 +171,7 @@ export default class MultiTimeGrid extends Component {
 
     width = width || gutterWidth;
 
-    this.slots = selectedEntityKeys.length <= 50 ? selectedEntityKeys.length : 50;
+    this.slots = selectedEntityKeys.length;
     this.rangeEventsMap = {};
     for (const key in eventMap) {
       if (!eventMap.hasOwnProperty(key)) continue;
@@ -238,7 +238,7 @@ export default class MultiTimeGrid extends Component {
       availabilityEndAccessor,
     } = this.props;
 
-    return this.props.selectedEntityKeys.slice(0, this.slots).map((selectedEntityKey, idx) => {
+    return this.props.selectedEntityKeys.map((selectedEntityKey, idx) => {
       let daysEvents = rangeEventsMap[selectedEntityKey] || [];
       daysEvents = daysEvents.filter(makeEventOrAvailabilityFilter(date, startAccessor, endAccessor));
       const availabilities = (

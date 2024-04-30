@@ -7,6 +7,7 @@ import { elementType } from './utils/propTypes'
 
 export default class TimeSlotGroup extends Component {
   static propTypes = {
+    availabilities: PropTypes.array,
     dayWrapperComponent: elementType,
     timeslots: PropTypes.number.isRequired,
     step: PropTypes.number.isRequired,
@@ -37,7 +38,16 @@ export default class TimeSlotGroup extends Component {
       this.props.timeGutterFormat !== nextProps.timeGutterFormat ||
       this.props.culture !== nextProps.culture ||
       this.props.height !== nextProps.height ||
-      date.neq(this.props.value, nextProps.value)
+      // Highly experimental/aggressive extra condition here (this.props.showLabels),
+      // in order to optimize calendar performance and prevent it from freezing
+      // when loading a MultiView with many providers. This is based on the fact
+      // that value doesn't seem to be used anywhere, even for slot selection
+      // events.
+      // The exception to the above observation is for the label column on the left
+      // of the calendar, which is why we will re-render on value updates for
+      // *only* those columns in particular.
+      this.props.showLabels && date.neq(this.props.value, nextProps.value) ||
+      (!this.props.showLabels && this.props.availabilities !== nextProps.availabilities)
     ) {
       return true;
     }
