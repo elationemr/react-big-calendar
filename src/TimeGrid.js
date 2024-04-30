@@ -178,7 +178,6 @@ export default class TimeGrid extends Component {
 
           <TimeColumn
             {...this.props}
-            availabilities={this.props.availabilities}
             min={dates.merge(start, this.props.min)}
             max={dates.merge(start, this.props.max)}
             showLabels
