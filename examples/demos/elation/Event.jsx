@@ -23,8 +23,24 @@ export default class Event extends React.Component {
   }
 
   render() {
-    const { /*event, */title } = this.props;
+    const { event, title } = this.props;
+    const eventStartTime = new Date(event._apptTime).toLocaleTimeString(
+      [],
+      { hour: 'numeric', minute: '2-digit' }
+    );
+    const eventEndTime = new Date(event._apptEnd).toLocaleTimeString(
+      [],
+      { hour: 'numeric', minute: '2-digit' }
+    );
 
-    return <div>{title}<div style={styles.bar}></div></div>
+    return (
+      <div>
+        {title}
+        <div style={{fontSize: '0.8em', marginTop: 5}}>
+          {eventStartTime} - {eventEndTime}
+        </div>
+        <div style={styles.bar}></div>
+      </div>
+    )
   }
 }
