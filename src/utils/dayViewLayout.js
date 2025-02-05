@@ -1,6 +1,10 @@
 import { accessor as get } from './accessors'
 import dates from './dates'
 
+// The Z-index for events is 2. Child events need an increased z-index to ensure that
+// they are displayed above the next parent event.
+const CHILD_EVENT_Z_INDEX = 3;
+
 export function startsBefore(date, min) {
   return dates.lt(dates.merge(min, date), min, 'minutes')
 }
@@ -231,6 +235,8 @@ export default function getStyledEvents ({
   let styledEvents = []
   // idx of top-most, left-most event in each group of events
   let idx = 0
+  let prevNbrOfColumns = 0;
+  let prevParentHasChildren = false;
 
   // One iteration will cover all connected events.
   while (idx < events.length) {
@@ -253,6 +259,19 @@ export default function getStyledEvents ({
         }
       });
     });
+
+    // If the previous parent event had children, we need to check if any of its children
+    // overlap with the current parent event. If so, we need to set the number of columns
+    // to the previous number of columns to make space for the overlapping child.
+    if (prevParentHasChildren) {
+      const hasOverlapWithPrevParentChild = events.some((_event, eventIdx) => {
+        if (eventIdx >= idx) return false;
+        return isChild(eventIdx, idx, { events, startAccessor, endAccessor, min, totalMin });
+      });
+      if(hasOverlapWithPrevParentChild) {
+        nbrOfColumns = prevNbrOfColumns;
+      }
+    }
 
     // Width of the top level events
     let width = (100 - rightOffset) / nbrOfColumns;
@@ -315,10 +334,19 @@ export default function getStyledEvents ({
             height,
             width: childWidth + childXAdjustment,
             xOffset: spaceOccupiedByParent + (childWidth * i),
+            zIndex: CHILD_EVENT_Z_INDEX,
           }
         }
       })
     })
+
+    prevNbrOfColumns = nbrOfColumns;
+
+    if (childGroups.length) {
+      prevParentHasChildren = true;
+    } else {
+      prevParentHasChildren = false;
+    }
 
     // Move past all events we just went through
     idx += 1 + siblings.length + childGroups.reduce(
