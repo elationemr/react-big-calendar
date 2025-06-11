@@ -78,7 +78,6 @@ button.rbc-input::-moz-focus-inner {
 .rbc-row-content {
   position: relative;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   z-index: 4;
@@ -262,7 +261,6 @@ button.rbc-input::-moz-focus-inner {
       flex: 1 0 0;
   width: 100%;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   height: 100%;
@@ -579,7 +577,6 @@ button.rbc-input::-moz-focus-inner {
 .rbc-time-content > .rbc-day-slot {
   width: 100%;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }

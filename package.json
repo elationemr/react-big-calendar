@@ -26,7 +26,7 @@
     "clean:examples": "rimraf examples/static",
     "less": "lessc --autoprefix=\"ie >= 10, last 2 versions\" src/less/styles.less ./lib/css/react-big-calendar.css",
     "assets": "cpy src/less/* lib/less",
-    "build": "npm run clean && babel src --out-dir lib && npm run assets && npm run less",
+    "build": "npm run clean && esr ./scripts/build.ts && npm run assets && npm run less",
     "build:examples": "npm run clean:examples && webpack --config webpack/examples.config.js",
     "build:visual-test": "webpack --config webpack/visual-test.js",
     "examples": "npm run clean:examples && webpack-dev-server --inline --hot --config webpack/examples.config.js",
@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@storybook/react": "^3.4.3",
+    "@types/node": "^24.0.0",
     "babel-cli": "^6.7.5",
     "babel-core": "^6.7.6",
     "babel-eslint": "^6.0.2",
@@ -50,6 +51,8 @@
     "component-metadata-loader": "^2.1.0",
     "cpy": "^3.4.1",
     "css-loader": "^0.15.6",
+    "esbuild": "^0.25.5",
+    "esbuild-runner": "^2.2.2",
     "eslint": "^3.0.0",
     "eslint-config-jason": "^4.0.0",
     "eslint-import-resolver-webpack": "^0.8.0",
@@ -92,5 +95,6 @@
     "react-overlays": "^0.8.3",
     "uncontrollable": "^5.1.0",
     "warning": "^3.0.0"
-  }
+  },
+  "packageManager": "yarn@4.6.0"
 }
