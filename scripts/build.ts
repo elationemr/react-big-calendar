@@ -14,7 +14,7 @@ export async function build() {
     entryPoints: [path.resolve(__dirname, "..", "src/index.js")],
     bundle: true,
     platform: "browser",
-    outfile: path.resolve(__dirname, "..", "lib", "index.js"),
+    outfile: path.resolve(__dirname, "..", "lib", "index.esm.js"),
     minify: false,
     external: [
      "react",

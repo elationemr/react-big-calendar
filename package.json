@@ -26,7 +26,7 @@
     "clean:examples": "rimraf examples/static",
     "less": "lessc --autoprefix=\"ie >= 10, last 2 versions\" src/less/styles.less ./lib/css/react-big-calendar.css",
     "assets": "cpy src/less/* lib/less",
-    "build": "npm run clean && esr ./scripts/build.ts && npm run assets && npm run less",
+    "build": "npm run clean && babel src --out-dir lib && esr ./scripts/build.ts && npm run assets && npm run less",
     "build:examples": "npm run clean:examples && webpack --config webpack/examples.config.js",
     "build:visual-test": "webpack --config webpack/visual-test.js",
     "examples": "npm run clean:examples && webpack-dev-server --inline --hot --config webpack/examples.config.js",
