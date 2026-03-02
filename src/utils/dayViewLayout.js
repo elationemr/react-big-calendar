@@ -43,22 +43,13 @@ let getSlot = (event, accessor, min, totalMin, isEndAccessor = false) => {
 
   let time = get(event, accessor);
 
-  // If start/end of the event is on the day that daylight savings FALLS BACK,
-  // then we need to adjust because the number of calendar slots doesn't match
-  // the number of hours in that day (we don't show two slots for the two 2AMs
-  // that exist). So, for example, 5 AM on this day is actually 6 hours after
-  // 12 AM, but we will use 4 AM to calculate the difference when comparing to
-  // 12 AM since we want to obtain a practical result of a 5 hour difference
-  // (and 4 AM is five hours after 1 AM on this day due to having two 2 AMs).
-  //
-  // We don't have to do this for SPRINGING FORWARD because the calendar hides
-  // the 2AM hour that gets skipped over, so the number of slots does match the
-  // number of hours in the day.
+  // Use the offset at the event's actual time (DST can change during the day).
   const dayStart = dates.startOf(time, 'day');
   const dayEnd = dates.endOf(time, 'day');
   const daylightSavingsShift =
     dayStart.getTimezoneOffset() - dayEnd.getTimezoneOffset();
   const isFallingBack = daylightSavingsShift < 0;
+  const isSpringingForward = daylightSavingsShift > 0;
   if (isFallingBack && time.getTimezoneOffset() !== dayStart.getTimezoneOffset()) {
     time = dates.add(time, daylightSavingsShift, 'minutes');
   }
@@ -84,7 +75,15 @@ let getSlot = (event, accessor, min, totalMin, isEndAccessor = false) => {
       time = new Date(min);
     }
   }
-  return event && positionFromDate(time, min, totalMin);
+  let pos = event && positionFromDate(time, min, totalMin);
+  // positionFromDate uses merge(min, time) which injects wall-clock hours but measures
+  // real milliseconds from dayMin. On spring-forward days the 1-hour DST gap means a
+  // post-transition event (e.g. 10am PDT) is only 9 UTC hours from midnight PST, so it
+  // lands at the 9am slot. Add the DST shift (60 min) to re-align with the wall clock.
+  if (typeof pos === 'number' && isSpringingForward && time.getTimezoneOffset() !== dayStart.getTimezoneOffset()) {
+    pos = Math.min(pos + 60, totalMin);
+  }
+  return pos;
 }
 
 /**

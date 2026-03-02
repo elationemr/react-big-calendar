@@ -211,11 +211,14 @@ export default class TimeGrid extends Component {
         makeEventOrAvailabilityFilter(date, availabilityStartAccessor, availabilityEndAccessor)
       );
 
+      const dayMin = dates.merge(date, min);
+      const dayMax = new Date(dayMin.getTime() + 24 * 60 * 60 * 1000);
+
       return (
         <DayColumn
           {...this.props }
-          min={dates.merge(date, min)}
-          max={dates.merge(date, max)}
+          min={dayMin}
+          max={dayMax}
           availabilityComponent={components.availability}
           availabilityWrapperComponent={components.availabilityWrapper}
           eventComponent={components.event}
