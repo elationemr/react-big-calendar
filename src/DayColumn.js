@@ -106,6 +106,7 @@ class DaySlot extends React.Component {
     const {
       min,
       max,
+      date,
       step,
       now,
       nowTimezone,
@@ -130,8 +131,8 @@ class DaySlot extends React.Component {
         {...props}
         className={cn(
           'rbc-day-slot',
-          !isMultiGrid && dates.isToday(max, nowTimezone) && 'rbc-today',
-          dates.lt(max, dates.today(nowTimezone), 'day') && 'rbc-past',
+          !isMultiGrid && dates.isToday(date, nowTimezone) && 'rbc-today',
+          dates.lt(date, dates.today(nowTimezone), 'day') && 'rbc-past',
           (bowser.mobile || bowser.tablet) && 'rbc-mobile-clickable'
         )}
         now={now}
@@ -213,6 +214,7 @@ class DaySlot extends React.Component {
         events
       , min
       , max
+      , date
       , culture
       , eventPropGetter
       , selected, eventTimeRangeFormat, eventComponent
@@ -224,6 +226,7 @@ class DaySlot extends React.Component {
       , startAccessor, endAccessor, titleAccessor, entityKeyAccessor } = this.props;
 
     let EventComponent = eventComponent
+    let effectiveMax = dates.min(max, dates.endOf(date, 'day'))
 
     let styledEvents = getStyledEvents({
       events, entityKeyAccessor, startAccessor, endAccessor, min, totalMin: this._totalMin, step, rightOffset
@@ -237,7 +240,7 @@ class DaySlot extends React.Component {
       const key = entityKeyAccessor && event[entityKeyAccessor] ? event[entityKeyAccessor] : `evt_${idx}`;
 
       let continuesPrior = startsBefore(start, min)
-      let continuesAfter = startsAfter(end, max)
+      let continuesAfter = startsAfter(end, effectiveMax)
 
       let title = get(event, titleAccessor)
       let label = localizer.format({ start, end }, eventTimeRangeFormat, culture)
