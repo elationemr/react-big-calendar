@@ -43,13 +43,15 @@ let getSlot = (event, accessor, min, totalMin, isEndAccessor = false) => {
 
   let time = get(event, accessor);
 
-  // Use the offset at the event's actual time (DST can change during the day).
+  // On fall-back DST days, the number of calendar slots doesn't match
+  // the number of hours in that day (we don't show two slots for the
+  // two 1AMs that exist). Adjust post-transition times so positions
+  // reflect practical elapsed hours rather than real elapsed hours.
   const dayStart = dates.startOf(time, 'day');
   const dayEnd = dates.endOf(time, 'day');
   const daylightSavingsShift =
     dayStart.getTimezoneOffset() - dayEnd.getTimezoneOffset();
   const isFallingBack = daylightSavingsShift < 0;
-  const isSpringingForward = daylightSavingsShift > 0;
   if (isFallingBack && time.getTimezoneOffset() !== dayStart.getTimezoneOffset()) {
     time = dates.add(time, daylightSavingsShift, 'minutes');
   }
@@ -75,15 +77,7 @@ let getSlot = (event, accessor, min, totalMin, isEndAccessor = false) => {
       time = new Date(min);
     }
   }
-  let pos = event && positionFromDate(time, min, totalMin);
-  // positionFromDate uses merge(min, time) which injects wall-clock hours but measures
-  // real milliseconds from dayMin. On spring-forward days the 1-hour DST gap means a
-  // post-transition event (e.g. 10am PDT) is only 9 UTC hours from midnight PST, so it
-  // lands at the 9am slot. Add the DST shift (60 min) to re-align with the wall clock.
-  if (typeof pos === 'number' && isSpringingForward && time.getTimezoneOffset() !== dayStart.getTimezoneOffset()) {
-    pos = Math.min(pos + 60, totalMin);
-  }
-  return pos;
+  return event && positionFromDate(time, min, totalMin);
 }
 
 /**
