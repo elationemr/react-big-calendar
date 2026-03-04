@@ -213,6 +213,7 @@ class DaySlot extends React.Component {
     let {
         events
       , min
+      , max
       , date
       , culture
       , eventPropGetter
@@ -225,7 +226,7 @@ class DaySlot extends React.Component {
       , startAccessor, endAccessor, titleAccessor, entityKeyAccessor } = this.props;
 
     let EventComponent = eventComponent
-    let dayEnd = dates.endOf(date, 'day')
+    let effectiveMax = dates.min(max, dates.endOf(date, 'day'))
 
     let styledEvents = getStyledEvents({
       events, entityKeyAccessor, startAccessor, endAccessor, min, totalMin: this._totalMin, step, rightOffset
@@ -239,7 +240,7 @@ class DaySlot extends React.Component {
       const key = entityKeyAccessor && event[entityKeyAccessor] ? event[entityKeyAccessor] : `evt_${idx}`;
 
       let continuesPrior = startsBefore(start, min)
-      let continuesAfter = startsAfter(end, dayEnd)
+      let continuesAfter = startsAfter(end, effectiveMax)
 
       let title = get(event, titleAccessor)
       let label = localizer.format({ start, end }, eventTimeRangeFormat, culture)
