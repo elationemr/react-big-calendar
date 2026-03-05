@@ -179,7 +179,7 @@ export default class TimeGrid extends Component {
           <TimeColumn
             {...this.props}
             min={dates.merge(start, this.props.min)}
-            max={dates.merge(start, this.props.max)}
+            max={new Date(dates.merge(start, this.props.min).getTime() + 24 * 60 * 60 * 1000)}
             showLabels
             style={{ width }}
             ref={gutterRef}

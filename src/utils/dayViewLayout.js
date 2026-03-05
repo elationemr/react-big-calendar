@@ -9,8 +9,11 @@ export function positionFromDate(date, min, total) {
   if (startsBefore(date, min))
     return 0
 
-  let diff = dates.diff(min, dates.merge(min, date), 'minutes')
-  return Math.min(diff, total)
+  const merged = dates.merge(min, date)
+  let wallMinutes = (dates.hours(merged) - dates.hours(min)) * 60
+    + (dates.minutes(merged) - dates.minutes(min))
+  if (wallMinutes < 0) wallMinutes += 24 * 60
+  return Math.min(wallMinutes, total)
 }
 
 /**
@@ -43,17 +46,6 @@ let getSlot = (event, accessor, min, totalMin, isEndAccessor = false) => {
 
   let time = get(event, accessor);
 
-  // Use the offset at the event's actual time (DST can change during the day).
-  const dayStart = dates.startOf(time, 'day');
-  const dayEnd = dates.endOf(time, 'day');
-  const daylightSavingsShift =
-    dayStart.getTimezoneOffset() - dayEnd.getTimezoneOffset();
-  const isFallingBack = daylightSavingsShift < 0;
-  const isSpringingForward = daylightSavingsShift > 0;
-  if (isFallingBack && time.getTimezoneOffset() !== dayStart.getTimezoneOffset()) {
-    time = dates.add(time, daylightSavingsShift, 'minutes');
-  }
-
   // Handling long range events. Though long range events have a condition that
   // start and end times are less than 24 hours apart, we don't perform that check
   // here. That should already be handled at the TimeGrid/MultiTimeGrid level, and
@@ -75,15 +67,7 @@ let getSlot = (event, accessor, min, totalMin, isEndAccessor = false) => {
       time = new Date(min);
     }
   }
-  let pos = event && positionFromDate(time, min, totalMin);
-  // positionFromDate uses merge(min, time) which injects wall-clock hours but measures
-  // real milliseconds from dayMin. On spring-forward days the 1-hour DST gap means a
-  // post-transition event (e.g. 10am PDT) is only 9 UTC hours from midnight PST, so it
-  // lands at the 9am slot. Add the DST shift (60 min) to re-align with the wall clock.
-  if (typeof pos === 'number' && isSpringingForward && time.getTimezoneOffset() !== dayStart.getTimezoneOffset()) {
-    pos = Math.min(pos + 60, totalMin);
-  }
-  return pos;
+  return event && positionFromDate(time, min, totalMin);
 }
 
 /**
