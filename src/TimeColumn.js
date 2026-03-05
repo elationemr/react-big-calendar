@@ -104,6 +104,11 @@ export default class TimeColumn extends Component {
     let next = date
     let isNow = false
 
+    const useWallClock = this.props.showLabels
+    const refDate = useWallClock
+      ? new Date(min.getFullYear(), 0, 1, dates.hours(min), dates.minutes(min))
+      : null
+
     for (var i = 0; i < numGroups; i++) {
       isNow = dates.inRange(
           now
@@ -112,8 +117,11 @@ export default class TimeColumn extends Component {
         , 'minutes'
       )
 
+      const slotDate = useWallClock
+        ? dates.add(refDate, i * groupLengthInMinutes, 'minutes')
+        : date
       next = dates.add(date, groupLengthInMinutes, 'minutes');
-      renderedSlots.push(this.renderTimeSliceGroup(i, isNow, date))
+      renderedSlots.push(this.renderTimeSliceGroup(i, isNow, slotDate))
 
       date = next
     }

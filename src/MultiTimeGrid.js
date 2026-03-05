@@ -204,7 +204,7 @@ export default class MultiTimeGrid extends Component {
               <TimeColumn
                 {...this.props}
                 min={dates.merge(date, this.props.min)}
-                max={dates.merge(date, this.props.max)}
+                max={new Date(dates.merge(date, this.props.min).getTime() + 24 * 60 * 60 * 1000)}
                 showLabels
                 ref={gutterRef}
                 className='rbc-time-gutter'
@@ -248,11 +248,12 @@ export default class MultiTimeGrid extends Component {
         makeEventOrAvailabilityFilter(date, availabilityStartAccessor, availabilityEndAccessor)
       );
 
+      const dayMin = dates.merge(date, min);
       return (
         <DayColumn
           {...this.props }
-          min={dates.merge(date, min)}
-          max={dates.merge(date, max)}
+          min={dayMin}
+          max={new Date(dayMin.getTime() + 24 * 60 * 60 * 1000)}
           availabilityComponent={components.availability}
           availabilityWrapperComponent={components.availabilityWrapper}
           availabilities={daysAvailabilities}
