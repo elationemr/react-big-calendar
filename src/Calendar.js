@@ -318,6 +318,13 @@ class Calendar extends React.Component {
    rightOffset: PropTypes.number,
 
    /**
+    * The percentage of each column's width reserved beyond the availability band, dividing
+    * unequally with rightOffset above since the two bands serve different content. Overlapping
+    * availabilities split what remains rather than each claiming the full remainder.
+    */
+   availabilityRightOffset: PropTypes.number,
+
+   /**
     * The number of slots per "section" in the time grid views. Adjust with `step`
     * to change the default of 1 hour long groups, with 30 minute slots.
     */

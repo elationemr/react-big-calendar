@@ -340,6 +340,7 @@ export function getStyledAvailabilities ({
   min,
   step,
   totalMin,
+  rightOffset = 0,
 }) {
   let styledAvailabilities = [];
   if (!unsortedAvailabilities) return styledAvailabilities;
@@ -389,15 +390,23 @@ export function getStyledAvailabilities ({
     }
   });
 
+  // Every overlapping availability divides the same band rather than each claiming its full
+  // width and only shifting over by a fixed 20px -- otherwise two or more windows at the same
+  // hour each render at full width, staircasing past whatever space the caller reserved
+  // beyond this band (an appointment strip, a clear sliver for clicking empty time, etc).
+  const nbrOfColumns = Object.keys(availabilitiesByColumn).length;
+  const width = (100 - rightOffset) / nbrOfColumns;
+
   Object.entries(availabilitiesByColumn).forEach(([columnIndex, group]) => {
     group.forEach((availability) => {
       const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs);
-      const xOffset = columnIndex * 20;
+      const xOffset = width * Number(columnIndex);
       styledAvailabilities.push({
         availability: availability,
         style: {
           height,
           top,
+          width,
           xOffset,
         }
       });

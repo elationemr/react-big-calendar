@@ -36,6 +36,10 @@ class DaySlot extends React.Component {
     entityKeyAccessor: PropTypes.string,
     step: PropTypes.number.isRequired,
     rightOffset: PropTypes.number.isRequired,
+    // How much of the column's width, as a percentage, is reserved beyond the availability
+    // band itself (an appointment strip, a clear sliver for empty-time clicks, etc). Overlapping
+    // availabilities divide what's left rather than each claiming the full remainder.
+    availabilityRightOffset: PropTypes.number,
     min: PropTypes.instanceOf(Date).isRequired,
     max: PropTypes.instanceOf(Date).isRequired,
     now: PropTypes.instanceOf(Date),
@@ -83,7 +87,7 @@ class DaySlot extends React.Component {
     isMultiGrid: PropTypes.bool,
   };
 
-  static defaultProps = { dragThroughEvents: true, rightOffset: 0, isMultiGrid: false };
+  static defaultProps = { dragThroughEvents: true, rightOffset: 0, availabilityRightOffset: 0, isMultiGrid: false };
   state = { selecting: false };
 
   componentDidMount() {
@@ -164,6 +168,7 @@ class DaySlot extends React.Component {
       availabilityStartAccessor,
       availabilityEndAccessor,
       availabilityKeyAccessor,
+      availabilityRightOffset,
       min,
       onSelectAvailability,
       step,
@@ -179,10 +184,11 @@ class DaySlot extends React.Component {
       min,
       step,
       totalMin: this._totalMin,
+      rightOffset: availabilityRightOffset,
     });
 
     return styledAvailabilities.map(({availability, style}, idx) => {
-      const { height, top, xOffset } = style;
+      const { height, top, width, xOffset } = style;
       const key = availabilityKeyAccessor && availability[availabilityKeyAccessor]
         ? availability[availabilityKeyAccessor]
         : `avbl_${idx}`;
@@ -194,7 +200,8 @@ class DaySlot extends React.Component {
             style={{
               top: `${top}%`,
               height: `${height}%`,
-              left: xOffset,
+              left: `${Math.max(0, xOffset)}%`,
+              width: `${width}%`,
             }}
             onClick={(e) => this._onSelectAvailability(availability, e)}
           >
