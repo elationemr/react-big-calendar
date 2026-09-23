@@ -87,7 +87,7 @@ class DaySlot extends React.Component {
     isMultiGrid: PropTypes.bool,
   };
 
-  static defaultProps = { dragThroughEvents: true, rightOffset: 0, availabilityRightOffset: 0, isMultiGrid: false };
+  static defaultProps = { dragThroughEvents: true, rightOffset: 0, isMultiGrid: false };
   state = { selecting: false };
 
   componentDidMount() {
@@ -192,6 +192,12 @@ class DaySlot extends React.Component {
       const key = availabilityKeyAccessor && availability[availabilityKeyAccessor]
         ? availability[availabilityKeyAccessor]
         : `avbl_${idx}`;
+      // `width` is only present when the caller opted into managing this band (see
+      // getStyledAvailabilities' `rightOffset` param) -- everyone else keeps the exact prior
+      // shape: a raw pixel `left` nudge, width left to that caller's own CSS.
+      const positionStyle = width === undefined
+        ? { left: xOffset }
+        : { left: `${Math.max(0, xOffset)}%`, width: `${width}%` };
 
       return (
         <AvailabilityWrapper key={key}>
@@ -200,8 +206,7 @@ class DaySlot extends React.Component {
             style={{
               top: `${top}%`,
               height: `${height}%`,
-              left: `${Math.max(0, xOffset)}%`,
-              width: `${width}%`,
+              ...positionStyle,
             }}
             onClick={(e) => this._onSelectAvailability(availability, e)}
           >

@@ -340,7 +340,11 @@ export function getStyledAvailabilities ({
   min,
   step,
   totalMin,
-  rightOffset = 0,
+  // Left undefined (rather than defaulted to 0), dividing the band among overlapping
+  // availabilities is opt-in: a caller not managing that band at all -- the compact "pin"
+  // marker over an appointment, sized entirely by its own CSS -- gets the exact style shape
+  // this returned before width-division existed, with no `width` key to fight that CSS.
+  rightOffset,
 }) {
   let styledAvailabilities = [];
   if (!unsortedAvailabilities) return styledAvailabilities;
@@ -394,19 +398,21 @@ export function getStyledAvailabilities ({
   // width and only shifting over by a fixed 20px -- otherwise two or more windows at the same
   // hour each render at full width, staircasing past whatever space the caller reserved
   // beyond this band (an appointment strip, a clear sliver for clicking empty time, etc).
+  // Skipped for a caller not managing that band (see the `rightOffset` param above).
+  const isManagingWidth = rightOffset !== undefined;
   const nbrOfColumns = Object.keys(availabilitiesByColumn).length;
-  const width = (100 - rightOffset) / nbrOfColumns;
+  const width = isManagingWidth ? (100 - rightOffset) / nbrOfColumns : undefined;
 
   Object.entries(availabilitiesByColumn).forEach(([columnIndex, group]) => {
     group.forEach((availability) => {
       const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs);
-      const xOffset = width * Number(columnIndex);
+      const xOffset = isManagingWidth ? width * Number(columnIndex) : columnIndex * 20;
       styledAvailabilities.push({
         availability: availability,
         style: {
           height,
           top,
-          width,
+          ...(isManagingWidth ? { width } : {}),
           xOffset,
         }
       });
