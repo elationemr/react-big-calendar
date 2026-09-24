@@ -340,6 +340,11 @@ export function getStyledAvailabilities ({
   min,
   step,
   totalMin,
+  // Left undefined (rather than defaulted to 0), dividing the band among overlapping
+  // availabilities is opt-in: a caller not managing that band at all -- the compact "pin"
+  // marker over an appointment, sized entirely by its own CSS -- gets the exact style shape
+  // this returned before width-division existed, with no `width` key to fight that CSS.
+  rightOffset,
 }) {
   let styledAvailabilities = [];
   if (!unsortedAvailabilities) return styledAvailabilities;
@@ -360,46 +365,80 @@ export function getStyledAvailabilities ({
     totalMin,
   };
 
-  const availabilitiesByColumn = {};
-  let columnIndex = 0;
+  // Every overlapping availability divides the same band rather than each claiming its full
+  // width and only shifting over by a fixed 20px -- otherwise two or more windows at the same
+  // hour each render at full width, staircasing past whatever space the caller reserved
+  // beyond this band (an appointment strip, a clear sliver for clicking empty time, etc).
+  // Skipped for a caller not managing that band (see the `rightOffset` param above).
+  const isManagingWidth = rightOffset !== undefined;
 
+  // Column packing runs per cluster of mutually time-connected availabilities, not once across
+  // the whole day: a day-wide column count is bounded by the single busiest stretch anywhere,
+  // and applying that one count/width to every availability would shrink a solo, non-overlapping
+  // one just because something else overlapped four-deep hours earlier. A cluster boundary is
+  // any point where every availability opened so far has already ended before the next starts.
+  const clusters = [];
+  let currentCluster = [];
+  let clusterEndTime = null;
   availabilities.forEach((availability) => {
-    let placed = false;
-
-    // Check for overlap with existing groups
-    const columnIndexes = Object.keys(availabilitiesByColumn);
-    for (let groupIndex = 0; groupIndex < columnIndexes.length; groupIndex++) {
-      const groupKey = columnIndexes[groupIndex];
-      const group = availabilitiesByColumn[groupKey];
-      const lastAvailability = group[group.length - 1];
-      const lastAvailabilityEndTime = get(lastAvailability, availabilityEndAccessor);
-      const availabilityStartTime = get(availability, availabilityStartAccessor);
-      if (lastAvailabilityEndTime <= availabilityStartTime) {
-        // No overlap, add to current group
-        group.push(availability);
-        placed = true;
-        break;
-      }
+    const startTime = get(availability, availabilityStartAccessor);
+    const endTime = get(availability, availabilityEndAccessor);
+    if (clusterEndTime !== null && startTime >= clusterEndTime) {
+      clusters.push(currentCluster);
+      currentCluster = [];
+      clusterEndTime = null;
     }
-
-    if (!placed) {
-      // Create a new group
-      availabilitiesByColumn[columnIndex] = [availability];
-      columnIndex++;
-    }
+    currentCluster.push(availability);
+    clusterEndTime = clusterEndTime === null || endTime > clusterEndTime ? endTime : clusterEndTime;
   });
+  if (currentCluster.length > 0) clusters.push(currentCluster);
 
-  Object.entries(availabilitiesByColumn).forEach(([columnIndex, group]) => {
-    group.forEach((availability) => {
-      const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs);
-      const xOffset = columnIndex * 20;
-      styledAvailabilities.push({
-        availability: availability,
-        style: {
-          height,
-          top,
-          xOffset,
+  clusters.forEach((cluster) => {
+    const availabilitiesByColumn = {};
+    let columnIndex = 0;
+
+    cluster.forEach((availability) => {
+      let placed = false;
+
+      // Check for overlap with existing groups
+      const columnIndexes = Object.keys(availabilitiesByColumn);
+      for (let groupIndex = 0; groupIndex < columnIndexes.length; groupIndex++) {
+        const groupKey = columnIndexes[groupIndex];
+        const group = availabilitiesByColumn[groupKey];
+        const lastAvailability = group[group.length - 1];
+        const lastAvailabilityEndTime = get(lastAvailability, availabilityEndAccessor);
+        const availabilityStartTime = get(availability, availabilityStartAccessor);
+        if (lastAvailabilityEndTime <= availabilityStartTime) {
+          // No overlap, add to current group
+          group.push(availability);
+          placed = true;
+          break;
         }
+      }
+
+      if (!placed) {
+        // Create a new group
+        availabilitiesByColumn[columnIndex] = [availability];
+        columnIndex++;
+      }
+    });
+
+    const nbrOfColumns = Object.keys(availabilitiesByColumn).length;
+    const width = isManagingWidth ? (100 - rightOffset) / nbrOfColumns : undefined;
+
+    Object.entries(availabilitiesByColumn).forEach(([columnIndexKey, group]) => {
+      group.forEach((availability) => {
+        const { height, top } = getYStyles(availabilities.indexOf(availability), helperArgs);
+        const xOffset = isManagingWidth ? width * Number(columnIndexKey) : columnIndexKey * 20;
+        styledAvailabilities.push({
+          availability: availability,
+          style: {
+            height,
+            top,
+            ...(isManagingWidth ? { width } : {}),
+            xOffset,
+          }
+        });
       });
     });
   });

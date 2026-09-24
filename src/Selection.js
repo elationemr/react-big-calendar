@@ -167,6 +167,15 @@ class Selection {
   }
 
   _openSelector(e) {
+    // This only ever runs while a mousedown is being tracked (the mousemove listener is
+    // added in _mouseDown and removed in _mouseUp), so every call here is part of an actual
+    // drag. Left unprevented from the first pixel of movement, the browser treats it as a
+    // native text-selection drag, including its own "auto-scroll toward the cursor" behavior,
+    // which fights the calendar's scroll position. Gating this on crossing the click
+    // tolerance is too late: by then the browser has often already armed the native
+    // selection off the earlier, unprevented movement.
+    e.preventDefault();
+
     var { x, y } = this._mouseDownData;
     var w = Math.abs(x - e.pageX);
     var h = Math.abs(y - e.pageY);

@@ -36,6 +36,10 @@ class DaySlot extends React.Component {
     entityKeyAccessor: PropTypes.string,
     step: PropTypes.number.isRequired,
     rightOffset: PropTypes.number.isRequired,
+    // How much of the column's width, as a percentage, is reserved beyond the availability
+    // band itself (an appointment strip, a clear sliver for empty-time clicks, etc). Overlapping
+    // availabilities divide what's left rather than each claiming the full remainder.
+    availabilityRightOffset: PropTypes.number,
     min: PropTypes.instanceOf(Date).isRequired,
     max: PropTypes.instanceOf(Date).isRequired,
     now: PropTypes.instanceOf(Date),
@@ -164,6 +168,7 @@ class DaySlot extends React.Component {
       availabilityStartAccessor,
       availabilityEndAccessor,
       availabilityKeyAccessor,
+      availabilityRightOffset,
       min,
       onSelectAvailability,
       step,
@@ -179,13 +184,20 @@ class DaySlot extends React.Component {
       min,
       step,
       totalMin: this._totalMin,
+      rightOffset: availabilityRightOffset,
     });
 
     return styledAvailabilities.map(({availability, style}, idx) => {
-      const { height, top, xOffset } = style;
+      const { height, top, width, xOffset } = style;
       const key = availabilityKeyAccessor && availability[availabilityKeyAccessor]
         ? availability[availabilityKeyAccessor]
         : `avbl_${idx}`;
+      // `width` is only present when the caller opted into managing this band (see
+      // getStyledAvailabilities' `rightOffset` param) -- everyone else keeps the exact prior
+      // shape: a raw pixel `left` nudge, width left to that caller's own CSS.
+      const positionStyle = width === undefined
+        ? { left: xOffset }
+        : { left: `${Math.max(0, xOffset)}%`, width: `${width}%` };
 
       return (
         <AvailabilityWrapper key={key}>
@@ -194,7 +206,7 @@ class DaySlot extends React.Component {
             style={{
               top: `${top}%`,
               height: `${height}%`,
-              left: xOffset,
+              ...positionStyle,
             }}
             onClick={(e) => this._onSelectAvailability(availability, e)}
           >
@@ -295,26 +307,6 @@ class DaySlot extends React.Component {
     let node = findDOMNode(this);
     let selector = this._selector = new Selection(()=> findDOMNode(this))
 
-    /* Disabling drag-selection for now
-    let maybeSelect = (box) => {
-      let onSelecting = this.props.onSelecting
-      let current = this.state || {};
-      let state = selectionState(box);
-      let { startDate: start, endDate: end } = state;
-
-      if (onSelecting) {
-        if (
-          (dates.eq(current.startDate, start, 'minutes') &&
-          dates.eq(current.endDate, end, 'minutes')) ||
-          onSelecting({ start, end }) === false
-        )
-          return
-      }
-
-      this.setState(state)
-    }
-    */
-
     let selectionState = ({ y }) => {
       let { step, min, max } = this.props;
       let { top, bottom } = getBoundsForNode(node)
@@ -325,7 +317,16 @@ class DaySlot extends React.Component {
 
       let current = (y - top) / range;
 
-      current = snapToSlot(minutesToDate(mins * current, min), step);
+      let currentMinutes = mins * current;
+
+      // snapToSlot floors, so extending a drag would only pick up a slot once the cursor
+      // cleared its final pixel. Biasing by half a step while a selection is in progress
+      // makes it snap to the nearest slot instead, so the selection grows as soon as the
+      // cursor is halfway in. The anchor slot stays floored: a plain click has to select the
+      // slot it landed on, not the next one down.
+      if (this.state.selecting) currentMinutes += step / 2;
+
+      current = snapToSlot(minutesToDate(currentMinutes, min), step);
 
       // This is needed to account for the removed 2 AM hour during spring
       // forward
@@ -356,10 +357,26 @@ class DaySlot extends React.Component {
       }
     }
 
-    /* Disabling drag-selection for now
+    let maybeSelect = (box) => {
+      let onSelecting = this.props.onSelecting
+      let current = this.state || {};
+      let state = selectionState(box);
+      let { startDate: start, endDate: end } = state;
+
+      if (onSelecting) {
+        if (
+          (dates.eq(current.startDate, start, 'minutes') &&
+          dates.eq(current.endDate, end, 'minutes')) ||
+          onSelecting({ start, end }) === false
+        )
+          return
+      }
+
+      this.setState(state)
+    }
+
     selector.on('selecting', maybeSelect)
     selector.on('selectStart', maybeSelect)
-    */
 
     selector.on('mousedown', (box) => {
       if (this.props.selectable !== 'ignoreEvents') return
@@ -375,7 +392,6 @@ class DaySlot extends React.Component {
         this.setState({ selecting: false })
       })
 
-    /* Disabling drag-selection for now
     selector
       .on('select', () => {
         if (this.state.selecting) {
@@ -383,7 +399,6 @@ class DaySlot extends React.Component {
           this.setState({ selecting: false })
         }
       })
-    */
   };
 
   _teardownSelectable = () => {
